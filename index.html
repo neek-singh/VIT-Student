@@ -1,0 +1,2638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VIMS – Student Panel | Vision IT Computer Institute</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--p:#a78bfa;--p2:#fb7185;--g:#4ade80;--w:#fbbf24;--d:#f87171;--bg:#07050f;--s:rgba(18,12,40,0.88);--b:rgba(167,139,250,0.15);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:#e2e8f0;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 10% 0%,rgba(167,139,250,0.09) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 90% 100%,rgba(251,113,133,0.07) 0%,transparent 55%);pointer-events:none;z-index:0;}
+  .glass{background:var(--s);border:1px solid var(--b);backdrop-filter:blur(20px);}
+  .gc{background:rgba(18,12,40,0.92);border:1px solid rgba(167,139,250,0.13);backdrop-filter:blur(20px);border-radius:1rem;}
+  /* Sidebar */
+  .sb{width:255px;background:rgba(9,6,22,0.97);border-right:1px solid rgba(167,139,250,0.1);transition:transform 0.3s cubic-bezier(.4,0,.2,1);}
+  .ni{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 0.9rem;border-radius:0.55rem;cursor:pointer;color:#64748b;font-size:0.84rem;font-weight:500;transition:all 0.18s;position:relative;}
+  .ni:hover{color:#e2e8f0;background:rgba(167,139,250,0.07);}
+  .ni.active{color:var(--p);background:rgba(167,139,250,0.1);}
+  .ni.active::before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:3px;background:var(--p);border-radius:0 3px 3px 0;}
+  .ns{font-size:0.68rem;color:#1e1b4b;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.45rem 0.9rem;margin-top:0.6rem;}
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:0.45rem;padding:0.48rem 1rem;border-radius:0.5rem;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;font-size:0.81rem;transition:all 0.16s;}
+  .bp{background:linear-gradient(135deg,#a78bfa,#fb7185);color:#07050f;}
+  .bp:hover{opacity:0.87;transform:translateY(-1px);box-shadow:0 4px 18px rgba(167,139,250,0.28);}
+  .bv{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);color:#a78bfa;}
+  .bv:hover{background:rgba(167,139,250,0.2);}
+  .bg2{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);color:#4ade80;}
+  .bg2:hover{background:rgba(74,222,128,0.2);}
+  .br{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.25);color:#f87171;}
+  .br:hover{background:rgba(248,113,113,0.2);}
+  .bw{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;}
+  .bw:hover{background:rgba(251,191,36,0.2);}
+  .bo{background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.25);color:#fb7185;}
+  .bo:hover{background:rgba(251,113,133,0.2);}
+  /* Inputs */
+  .inp{width:100%;background:rgba(9,6,22,0.92);border:1px solid rgba(167,139,250,0.18);color:#e2e8f0;padding:0.58rem 0.88rem;border-radius:0.5rem;font-family:'Outfit',sans-serif;font-size:0.84rem;outline:none;transition:border-color 0.18s,box-shadow 0.18s;}
+  .inp:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(167,139,250,0.09);}
+  .inp::placeholder{color:#2d2a4a;}
+  select.inp option{background:#07050f;}
+  .lbl{display:block;color:#64748b;font-size:0.77rem;font-weight:600;margin-bottom:0.28rem;letter-spacing:0.02em;}
+  /* Sections */
+  .sec{display:none;animation:fu 0.22s ease;}
+  .sec.active{display:block;}
+  @keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+  /* Stats */
+  .sc{background:rgba(18,12,40,0.9);border:1px solid rgba(167,139,250,0.1);border-radius:1rem;padding:1.15rem;transition:all 0.18s;}
+  .sc:hover{border-color:rgba(167,139,250,0.28);transform:translateY(-2px);}
+  /* Table */
+  .tbl{width:100%;border-collapse:collapse;font-size:0.82rem;}
+  .tbl th{text-align:left;padding:0.65rem 0.9rem;color:#3730a3;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(167,139,250,0.08);}
+  .tbl td{padding:0.7rem 0.9rem;border-bottom:1px solid rgba(167,139,250,0.05);color:#c4b5fd;transition:background 0.12s;}
+  .tbl tr:hover td{background:rgba(167,139,250,0.03);}
+  .tbl tr:last-child td{border-bottom:none;}
+  /* Badges */
+  .badge{display:inline-flex;align-items:center;padding:0.18rem 0.55rem;border-radius:9999px;font-size:0.7rem;font-weight:700;}
+  .bv2{background:rgba(167,139,250,0.13);color:#a78bfa;border:1px solid rgba(167,139,250,0.28);}
+  .bg3{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.28);}
+  .br2{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.28);}
+  .bw2{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.28);}
+  .bo2{background:rgba(251,113,133,0.12);color:#fb7185;border:1px solid rgba(251,113,133,0.28);}
+  .bi{background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.28);}
+  /* Modal */
+  .mbg{position:fixed;inset:0;background:rgba(3,2,10,0.9);backdrop-filter:blur(10px);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;}
+  .mbox{background:#07050f;border:1px solid rgba(167,139,250,0.2);border-radius:1.2rem;padding:1.75rem;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;}
+  /* Toast */
+  .toast{position:fixed;top:1.2rem;right:1.2rem;z-index:9999;padding:0.72rem 1.2rem;border-radius:0.7rem;font-size:0.82rem;font-weight:600;animation:si 0.28s ease;max-width:295px;pointer-events:none;}
+  .ts{background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.35);color:#4ade80;}
+  .te{background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.35);color:#f87171;}
+  .ti{background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;}
+  @keyframes si{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+  .nb{position:absolute;top:-3px;right:-3px;background:#fb7185;color:#fff;font-size:0.58rem;font-weight:800;min-width:15px;height:15px;border-radius:9999px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+  /* Exam interface */
+  .opt-btn{width:100%;text-align:left;padding:0.75rem 1rem;border-radius:0.6rem;border:1px solid rgba(167,139,250,0.18);background:rgba(18,12,40,0.8);color:#c4b5fd;font-family:'Outfit',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:0.75rem;}
+  .opt-btn:hover{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.07);}
+  .opt-btn.selected{border-color:#a78bfa;background:rgba(167,139,250,0.15);color:#fff;}
+  .opt-btn.correct{border-color:#4ade80;background:rgba(74,222,128,0.15);color:#4ade80;}
+  .opt-btn.wrong{border-color:#f87171;background:rgba(248,113,113,0.12);color:#f87171;}
+  .q-dot{width:28px;height:28px;border-radius:0.35rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;cursor:pointer;transition:all 0.12s;border:1px solid rgba(167,139,250,0.18);color:#64748b;background:rgba(18,12,40,0.8);}
+  .q-dot.answered{background:rgba(167,139,250,0.2);color:#a78bfa;border-color:rgba(167,139,250,0.4);}
+  .q-dot.current{background:var(--p);color:#07050f;border-color:var(--p);}
+  .timer-box{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:600;color:#a78bfa;}
+  .timer-warn{color:#f87171;animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  /* Progress */
+  .pbar{height:5px;border-radius:9999px;background:rgba(167,139,250,0.1);overflow:hidden;}
+  .pfill{height:100%;border-radius:9999px;background:linear-gradient(90deg,#a78bfa,#fb7185);transition:width 0.4s;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.22);border-radius:3px;}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;animation:blink 1.5s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+  .hw-card{background:rgba(18,12,40,0.85);border:1px solid rgba(167,139,250,0.12);border-radius:0.85rem;padding:1rem;transition:all 0.18s;}
+  .hw-card:hover{border-color:rgba(167,139,250,0.3);}
+  .hw-option{width:100%;text-align:left;padding:0.7rem 1rem;border-radius:0.55rem;border:1px solid rgba(167,139,250,0.18);background:rgba(18,12,40,0.8);color:#c4b5fd;font-family:'Outfit',sans-serif;font-size:0.86rem;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:0.75rem;}
+  .hw-option:hover{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.07);}
+  .hw-option.selected{border-color:#a78bfa;background:rgba(167,139,250,0.15);color:#fff;}
+  .hw-option.correct{border-color:#4ade80;background:rgba(74,222,128,0.12);color:#4ade80;pointer-events:none;}
+  .hw-option.wrong{border-color:#f87171;background:rgba(248,113,113,0.1);color:#f87171;pointer-events:none;}
+  .sched-slot{border-left:3px solid #a78bfa;background:rgba(167,139,250,0.06);border-radius:0 0.6rem 0.6rem 0;padding:0.7rem 0.9rem;margin-bottom:0.4rem;}
+  .topic-card{background:rgba(18,12,40,0.85);border:1px solid rgba(167,139,250,0.12);border-radius:0.85rem;padding:1rem;transition:all 0.18s;}
+  .topic-card:hover{border-color:rgba(167,139,250,0.3);}
+  .mat-card{display:flex;align-items:center;gap:0.9rem;padding:0.8rem 1rem;border:1px solid rgba(167,139,250,0.12);border-radius:0.6rem;background:rgba(18,12,40,0.8);transition:all 0.15s;}
+  .mat-card:hover{border-color:rgba(167,139,250,0.3);}
+  /* ── Online Classes / Video styles ── */
+  .chapter-pill{display:inline-flex;align-items:center;gap:0.45rem;padding:0.4rem 0.9rem;border-radius:9999px;border:1px solid rgba(167,139,250,0.22);background:rgba(167,139,250,0.06);color:#a78bfa;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.16s;}
+  .chapter-pill:hover,.chapter-pill.active{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.5);color:#fff;}
+  .playlist-thumb-card{background:rgba(18,12,40,0.9);border:1px solid rgba(167,139,250,0.12);border-radius:0.9rem;overflow:hidden;cursor:pointer;transition:all 0.18s;}
+  .playlist-thumb-card:hover{border-color:rgba(167,139,250,0.38);transform:translateY(-3px);box-shadow:0 8px 32px rgba(167,139,250,0.12);}
+  .vid-list-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.9rem;border-bottom:1px solid rgba(167,139,250,0.06);cursor:pointer;transition:background 0.12s;}
+  .vid-list-item:hover{background:rgba(167,139,250,0.07);}
+  .vid-list-item.playing{background:rgba(167,139,250,0.13);border-left:3px solid #a78bfa;}
+  .yt-frame{width:100%;aspect-ratio:16/9;border:none;border-radius:0.75rem;background:#000;}
+  .vid-thumb-sm{width:80px;height:48px;border-radius:0.4rem;object-fit:cover;background:#0a0518;flex-shrink:0;}
+  /* Curriculum student styles */
+  .scur-unit{background:rgba(18,12,40,0.9);border:1px solid rgba(167,139,250,0.12);border-radius:0.9rem;overflow:hidden;transition:border-color 0.2s;}
+  .scur-unit:hover{border-color:rgba(167,139,250,0.28);}
+  .scur-unit-hdr{display:flex;align-items:center;gap:0.75rem;padding:0.9rem 1.1rem;cursor:pointer;background:rgba(167,139,250,0.04);}
+  .scur-lesson{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1.1rem;border-top:1px solid rgba(167,139,250,0.05);}
+  .sl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .sl-planned{background:#475569;} .sl-ongoing{background:#fbbf24;} .sl-done{background:#4ade80;}
+  .res-chip{display:inline-flex;align-items:center;gap:0.3rem;padding:0.18rem 0.6rem;border-radius:9999px;font-size:0.68rem;font-weight:600;cursor:pointer;transition:all 0.14s;}
+  .res-chip:hover{filter:brightness(1.2);}
+  .rc-yt{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}
+  .rc-mat{background:rgba(167,139,250,0.1);color:#c4b5fd;border:1px solid rgba(167,139,250,0.22);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 relative z-10">
+  <div class="gc p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-rose-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </div>
+      <h1 class="text-2xl font-bold text-white">Student Portal</h1>
+      <p class="text-slate-500 text-sm mt-1">Vision IT Computer Institute</p>
+    </div>
+    <div class="space-y-4">
+      <div><label class="lbl">Student ID</label><input id="loginId" class="inp" placeholder="VIT-STD-001" onkeydown="if(event.key==='Enter')handleLogin()"/></div>
+      <div><label class="lbl">Password</label><input id="loginPass" class="inp" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')handleLogin()"/></div>
+      <button onclick="handleLogin()" id="loginBtn" class="btn bp w-full py-3 text-sm justify-center mt-2">Sign In</button>
+    </div>
+    <p class="text-center text-slate-600 text-xs mt-5">Contact your teacher/admin for credentials</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;" class="flex h-screen overflow-hidden relative z-10">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sb flex flex-col py-5 px-3 fixed h-full z-50 lg:relative" style="transform:translateX(-100%)">
+    <div class="flex items-center gap-3 px-2 mb-6">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-rose-500 flex items-center justify-center flex-shrink-0">
+        <span class="text-white font-bold text-xs">V</span>
+      </div>
+      <div><p class="font-bold text-white text-sm leading-tight">VIMS Student</p><p class="text-slate-600 text-xs">Learning Portal</p></div>
+    </div>
+    <nav class="flex-1 overflow-y-auto space-y-0.5">
+      <div class="ns">Overview</div>
+      <div class="ni active" onclick="showSec('dashboard')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </div>
+      <div class="ni" onclick="showSec('profile')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>My Profile
+      </div>
+      <div class="ns">Courses & Classes</div>
+      <div class="ni" onclick="showSec('courses')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>My Courses
+      </div>
+      <div class="ni" onclick="showSec('batches')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>My Batches
+      </div>
+      <div class="ni" onclick="showSec('topics')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>Topic-wise Classes
+      </div>
+      <div class="ni" onclick="showSec('schedule')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Class Schedule
+      </div>
+      <div class="ni" onclick="showSec('materials')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>Class Materials
+      </div>
+      <div class="ni" onclick="showSec('videos')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>🎬 Online Classes
+      </div>
+      <div class="ni" onclick="showSec('curriculum')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>📋 Curriculum
+      </div>
+      <div class="ns">Academic</div>
+      <div class="ni" onclick="showSec('attendance')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>Attendance
+      </div>
+      <div class="ni relative" onclick="showSec('homework')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Daily Homework<span id="hwPendingBadge" class="nb hidden">!</span>
+      </div>
+      <div class="ni" onclick="showSec('results')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Results & Rank
+      </div>
+      <div class="ns">Exams</div>
+      <div class="ni" onclick="showSec('exams')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Online Exams
+      </div>
+      <div class="ns">More</div>
+      <div class="ni" onclick="showSec('downloads')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Downloads
+      </div>
+      <div class="ni" onclick="showSec('fees')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>My Fees
+      </div>
+      <div class="ni relative" onclick="showSec('notifications')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        Notifications<span id="sbNotifBadge" class="nb hidden">0</span>
+      </div>
+    </nav>
+    <div class="mt-4 px-1">
+      <div class="gc p-3 flex items-center gap-3">
+        <img id="sbAvatar" src="" class="w-9 h-9 rounded-xl object-cover bg-slate-800"/>
+        <div class="flex-1 min-w-0">
+          <p id="sbName" class="text-white text-xs font-bold truncate">Student</p>
+          <p class="text-slate-600 text-xs">Student</p>
+        </div>
+        <button onclick="logout()" title="Logout" class="text-slate-600 hover:text-red-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="glass border-b border-violet-400/10 px-4 lg:px-6 py-3.5 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSb()" class="lg:hidden text-slate-500 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h2 id="pgTitle" class="font-bold text-white text-base">Dashboard</h2>
+        <div class="flex items-center gap-1.5 ml-2"><div class="live-dot"></div><span class="text-slate-600 text-xs">Live</span></div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="todayDate" class="text-slate-500 text-xs hidden md:block"></span>
+        <button onclick="showSec('notifications')" class="relative text-slate-500 hover:text-violet-400 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span id="hNotifBadge" class="nb hidden">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-5">
+
+      <!-- DASHBOARD -->
+      <div id="sec-dashboard" class="sec active">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Enrolled Courses</div><div id="dCourses" class="text-2xl font-bold text-violet-400">0</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Attendance %</div><div id="dAtt" class="text-2xl font-bold text-green-400">0%</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Pending Homework</div><div id="dHomework" class="text-2xl font-bold text-rose-400">0</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Notifications</div><div id="dNotifs" class="text-2xl font-bold text-yellow-400">0</div></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+          <div class="gc p-5"><h3 class="text-sm font-semibold text-slate-300 mb-4">Performance Overview</h3><canvas id="chartPerf" height="210"></canvas></div>
+          <div class="gc p-5">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Join a Course</h3>
+            <div class="space-y-3">
+              <p class="text-slate-500 text-xs">Enter the 6-character join code given by your teacher.</p>
+              <div class="flex gap-2">
+                <input id="joinCodeInput" class="inp flex-1" placeholder="e.g. ABC123" maxlength="6" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.15em;text-transform:uppercase"/>
+                <button onclick="joinCourse()" class="btn bp whitespace-nowrap">Join Course</button>
+              </div>
+              <div id="joinResult" class="hidden"></div>
+            </div>
+            <div class="mt-5">
+              <h4 class="text-xs text-slate-500 font-semibold mb-3 uppercase tracking-wider">My Enrolled Courses</h4>
+              <div id="dashCourseList" class="space-y-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="gc p-5">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">📅 Today's Classes</h3>
+            <div id="todayClassesDash" class="space-y-2"><div class="text-slate-600 text-xs text-center py-4">Loading schedule...</div></div>
+          </div>
+          <div class="gc p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-semibold text-slate-300">📝 Pending Homework</h3>
+              <button onclick="showSec('homework')" class="text-violet-400 hover:text-violet-300 text-xs transition-colors">View All →</button>
+            </div>
+            <div id="pendingHwDash" class="space-y-2"><div class="text-slate-600 text-xs text-center py-4">Loading...</div></div>
+            </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="sec-profile" class="sec">
+        <div class="max-w-xl">
+          <div class="gc p-6">
+            <div class="flex items-center gap-5 mb-6">
+              <div class="relative">
+                <img id="profileImg" src="" class="w-20 h-20 rounded-2xl object-cover bg-slate-800 border border-violet-400/20"/>
+                <label class="absolute -bottom-2 -right-2 w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center cursor-pointer hover:bg-violet-400 transition-colors shadow-lg">
+                  <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  <input type="file" accept="image/*" id="photoInput" class="hidden" onchange="uploadPhoto(this)"/>
+                </label>
+              </div>
+              <div>
+                <h3 id="profName" class="text-xl font-bold text-white">Student</h3>
+                <p id="profId" class="text-slate-500 text-sm mt-0.5"></p>
+                <span class="badge bv2 mt-1">Student</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="lbl">Full Name</label><input id="pName" class="inp"/></div>
+              <div><label class="lbl">User ID <span class="text-slate-700 text-xs font-normal">(cannot be changed)</span></label><input id="pUserId" class="inp" readonly style="opacity:0.5;cursor:not-allowed;background:rgba(9,6,22,0.5)"/></div>
+              <div><label class="lbl">Phone</label><input id="pPhone" class="inp"/></div>
+              <div><label class="lbl">Guardian Name</label><input id="pGuardian" class="inp"/></div>
+              <div><label class="lbl">Address</label><input id="pAddress" class="inp"/></div>
+              <div><label class="lbl">New Password</label><input id="pPass" class="inp" type="password" placeholder="Leave blank to keep"/></div>
+            </div>
+            <button onclick="saveProfile()" class="btn bp mt-5">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COURSES -->
+      <div id="sec-courses" class="sec">
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+          <div class="flex gap-2 flex-1">
+            <input id="joinCode2" class="inp" placeholder="Join with code (e.g. ABC123)" maxlength="6" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.1em"/>
+            <button onclick="joinCourse2()" class="btn bp whitespace-nowrap">Join</button>
+          </div>
+        </div>
+        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="gc p-6 text-center text-slate-600 col-span-full">Loading your courses...</div>
+        </div>
+      </div>
+
+      <!-- MY BATCHES (student) -->
+      <div id="sec-batches" class="sec">
+        <div id="studentBatchesList" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="gc p-6 text-center text-slate-600 col-span-full">Loading your batches...</div>
+        </div>
+        <!-- Batch Detail -->
+        <div id="studentBatchDetail" class="hidden">
+          <div class="gc p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 id="stdBatchName" class="text-lg font-bold text-white">Batch</h3>
+                <p id="stdBatchMeta" class="text-slate-500 text-xs mt-0.5"></p>
+              </div>
+              <button onclick="closeStudentBatchDetail()" class="btn bv text-xs">← Back</button>
+            </div>
+            <div class="flex gap-2 mb-5 border-b border-violet-400/15 pb-2">
+              <button onclick="showStudentBatchTab('info')" id="sbtab-info" class="btn bp text-xs">📋 Info</button>
+              <button onclick="showStudentBatchTab('attendance')" id="sbtab-attendance" class="btn bv text-xs">📊 My Attendance</button>
+              <button onclick="showStudentBatchTab('classmates')" id="sbtab-classmates" class="btn bv text-xs">👥 Classmates</button>
+            </div>
+            <div id="studentBatchTab-info"></div>
+            <div id="studentBatchTab-attendance" class="hidden"></div>
+            <div id="studentBatchTab-classmates" class="hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPIC-WISE CLASSES -->
+      <div id="sec-topics" class="sec">
+        <div class="mb-5">
+          <select id="topicCourseFilter" class="inp" style="max-width:300px" onchange="loadStudentTopics()"><option value="">Select Course</option></select>
+        </div>
+        <div id="studentTopicsList" class="space-y-3"><div class="gc p-6 text-center text-slate-600">Select a course to view topics</div></div>
+      </div>
+
+      <!-- CLASS SCHEDULE -->
+      <div id="sec-schedule" class="sec">
+        <div class="mb-5">
+          <select id="schedCourseFilter" class="inp" style="max-width:300px" onchange="loadStudentSchedule()"><option value="">Select Course</option></select>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="gc p-5">
+            <h3 class="font-semibold text-white text-sm mb-4">📅 Weekly Timetable</h3>
+            <div id="weeklySchedStudent" class="space-y-1"><div class="text-slate-600 text-xs text-center py-6">Select a course</div></div>
+          </div>
+          <div class="lg:col-span-2 gc p-5">
+            <h3 class="font-semibold text-white text-sm mb-4">All Scheduled Classes</h3>
+            <div id="scheduleListStudent" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"><div class="text-slate-600 text-xs text-center py-6">Select a course</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLASS MATERIALS -->
+      <div id="sec-materials" class="sec">
+        <div class="flex flex-col sm:flex-row gap-3 mb-5">
+          <select id="matCourseFilter" class="inp" onchange="loadStudentMaterials()"><option value="">Select Course</option></select>
+          <select id="matTopicFilter" class="inp" onchange="loadStudentMaterials()"><option value="">All Topics</option></select>
+        </div>
+        <div id="studentMaterialsList" class="grid grid-cols-1 md:grid-cols-2 gap-3"><div class="gc p-6 text-center text-slate-600 col-span-full">Select a course to view materials</div></div>
+      </div>
+
+      <!-- ═══════════ ONLINE CLASSES ═══════════ -->
+      <div id="sec-videos" class="sec">
+
+        <!-- VIEW 1: Browse Playlists by Chapter -->
+        <div id="vidBrowseView">
+          <!-- Course selector -->
+          <div class="flex flex-col sm:flex-row gap-3 mb-5">
+            <div class="relative flex-1">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <select id="vidCourseFilter" class="inp pl-9" onchange="loadStudentPlaylists()"><option value="">Select Course</option></select>
+            </div>
+          </div>
+          <!-- Chapter filter pills -->
+          <div id="chapterPills" class="flex flex-wrap gap-2 mb-5 hidden">
+            <button class="chapter-pill active" onclick="filterByChapter('')" id="pillAll">📚 All Chapters</button>
+          </div>
+          <!-- Playlist grid -->
+          <div id="studentPlaylistGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="gc p-8 text-center text-slate-600 col-span-full">
+              <div class="text-4xl mb-3">🎬</div>
+              <p>Select a course to view online classes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: Watch Playlist (player + playlist panel) -->
+        <div id="vidPlayerView" style="display:none">
+          <!-- Header -->
+          <div class="flex items-center gap-3 mb-5">
+            <button onclick="backToPlaylistBrowse()" class="gc px-4 py-2 text-sm text-violet-400 hover:text-white transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+            </button>
+            <div class="flex-1 min-w-0">
+              <h2 id="vidPlayerTitle" class="text-white font-bold text-base truncate"></h2>
+              <p id="vidPlayerMeta" class="text-slate-500 text-xs"></p>
+            </div>
+          </div>
+
+          <!-- Main layout: player left, playlist right -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            <!-- Video Player Column -->
+            <div class="lg:col-span-2 space-y-4">
+              <!-- Player frame -->
+              <div class="gc p-3">
+                <div id="studentVideoFrame">
+                  <div class="w-full aspect-video rounded-xl bg-slate-950 flex items-center justify-center">
+                    <div class="text-center"><div class="text-5xl mb-3">▶️</div><p class="text-slate-500 text-sm">Select a video to start watching</p></div>
+                  </div>
+                </div>
+                <!-- Now playing info -->
+                <div id="nowPlayingBox" class="mt-4 hidden">
+                  <h3 id="nowPlayingVTitle" class="text-white font-bold text-sm mb-1"></h3>
+                  <p id="nowPlayingVDesc" class="text-slate-500 text-xs leading-relaxed"></p>
+                  <div class="flex items-center gap-3 mt-3">
+                    <span id="nowPlayingVDur" class="text-violet-400 text-xs font-semibold"></span>
+                    <span id="nowPlayingVNum" class="text-slate-600 text-xs"></span>
+                  </div>
+                </div>
+              </div>
+              <!-- Progress bar for playlist -->
+              <div class="gc p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-slate-400 text-xs font-semibold">Playlist Progress</p>
+                  <span id="vidProgressLabel" class="text-violet-400 text-xs font-bold">0 / 0 watched</span>
+                </div>
+                <div class="pbar"><div id="vidProgressBar" class="pfill" style="width:0%"></div></div>
+              </div>
+              <!-- Prev/Next navigation -->
+              <div class="flex gap-3">
+                <button id="prevVidBtn" onclick="navigateVideo(-1)" class="gc flex-1 py-3 text-sm text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-30" disabled>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Previous
+                </button>
+                <button id="nextVidBtn" onclick="navigateVideo(1)" class="gc flex-1 py-3 text-sm text-violet-400 hover:text-white transition-colors flex items-center justify-center gap-2" disabled>
+                  Next<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Playlist Panel Column -->
+            <div class="gc overflow-hidden flex flex-col" style="max-height:620px">
+              <div class="px-4 py-3 border-b border-violet-400/10 flex-shrink-0">
+                <p class="text-white text-sm font-bold" id="playlistPanelTitle">Videos</p>
+                <p id="playlistPanelCount" class="text-slate-500 text-xs mt-0.5"></p>
+              </div>
+              <div id="studentVideoList" class="overflow-y-auto flex-1 divide-y divide-violet-400/5"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════ CURRICULUM (Student View) ═══════════ -->
+      <div id="sec-curriculum" class="sec">
+        <!-- Course selector -->
+        <div class="flex gap-3 mb-5">
+          <select id="sCurCourse" class="inp flex-1" onchange="loadStudentCurriculum()"><option value="">Select Course</option></select>
+        </div>
+
+        <!-- Summary card -->
+        <div id="sCurSummary" class="gc p-4 mb-5 hidden">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <h2 id="sCurTitle" class="text-white font-bold text-base"></h2>
+              <p id="sCurMeta" class="text-slate-500 text-xs mt-0.5"></p>
+            </div>
+            <div id="sCurBigPct" class="text-2xl font-bold text-violet-400 font-mono flex-shrink-0">0%</div>
+          </div>
+          <!-- Progress bar -->
+          <div class="pbar mb-2"><div id="sCurProgBar" class="pfill" style="width:0%"></div></div>
+          <div class="flex items-center justify-between text-xs">
+            <span id="sCurProgLabel" class="text-slate-500"></span>
+            <div class="flex gap-3">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-500 inline-block"></span><span class="text-slate-500">Planned</span></span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span><span class="text-slate-500">Ongoing</span></span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span><span class="text-slate-500">Done</span></span>
+            </div>
+          </div>
+          <!-- Quick stats -->
+          <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="rounded-xl p-2.5 text-center" style="background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.15)">
+              <div id="sCurStatU" class="text-lg font-bold text-violet-400">0</div><div class="text-slate-600 text-xs">Units</div>
+            </div>
+            <div class="rounded-xl p-2.5 text-center" style="background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.15)">
+              <div id="sCurStatL" class="text-lg font-bold text-sky-400">0</div><div class="text-slate-600 text-xs">Lessons</div>
+            </div>
+            <div class="rounded-xl p-2.5 text-center" style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.15)">
+              <div id="sCurStatD" class="text-lg font-bold text-green-400">0</div><div class="text-slate-600 text-xs">Completed</div>
+            </div>
+          </div>
+          <!-- Objectives -->
+          <div id="sCurObjectives" class="mt-4 hidden">
+            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wide mb-2">Learning Objectives</p>
+            <ul id="sCurObjList" class="space-y-1"></ul>
+          </div>
+        </div>
+
+        <!-- Units accordion -->
+        <div id="sCurUnits" class="space-y-3"></div>
+        <div id="sCurEmpty" class="gc p-10 text-center text-slate-600">
+          <div class="text-4xl mb-3">📋</div>
+          <p>Select a course to view its curriculum</p>
+        </div>
+      </div>
+
+      <!-- DAILY HOMEWORK -->
+      <div id="sec-homework" class="sec">
+        <div class="flex flex-col sm:flex-row gap-3 mb-5">
+          <select id="hwCourseFilter" class="inp" onchange="loadStudentHomework()"><option value="">Select Course</option></select>
+          <input id="hwDateFilter" class="inp" type="date" onchange="loadStudentHomework()" style="max-width:180px"/>
+          <select id="hwStatusFilter" class="inp" onchange="loadStudentHomework()" style="max-width:160px">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="done">Submitted</option>
+          </select>
+        </div>
+        <div id="studentHwList" class="space-y-4"><div class="gc p-6 text-center text-slate-600">Select a course to view homework</div></div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div id="sec-attendance" class="sec">
+        <div class="flex gap-3 mb-5">
+          <select id="attCourse" class="inp" onchange="loadMyAtt()"><option value="">All Courses</option></select>
+          <select id="attMonth" class="inp" onchange="loadMyAtt()">
+            <option value="">All Months</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="gc p-5">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Attendance Summary</h3>
+            <div id="attSummary" class="space-y-3"></div>
+          </div>
+          <div class="lg:col-span-2 gc overflow-hidden">
+            <table class="tbl">
+              <thead><tr><th>Date</th><th>Course</th><th>Status</th></tr></thead>
+              <tbody id="attBody"><tr><td colspan="3" class="text-center py-10 text-slate-600">Select a course to view</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="sec-results" class="sec">
+        <div class="flex gap-3 mb-5">
+          <select id="resultCourse" class="inp" onchange="loadMyResults()"><option value="">All Courses</option></select>
+        </div>
+        <div class="grid grid-cols-1 gap-5">
+          <div class="gc p-5"><h3 class="text-sm font-semibold text-slate-300 mb-3">Performance Chart</h3><canvas id="chartMyResults" height="150"></canvas></div>
+
+          <!-- Rank Card -->
+          <div id="rankCard" class="gc p-5 hidden">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">My Rank</h3>
+            <div class="flex items-center gap-5">
+              <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500/20 to-rose-500/20 border border-violet-400/20 flex items-center justify-center text-3xl font-bold text-violet-400" id="myRankNum" style="font-family:'JetBrains Mono',monospace">#-</div>
+              <div>
+                <p class="text-white font-semibold" id="myRankName">-</p>
+                <p class="text-slate-500 text-sm mt-0.5" id="myRankCourse">-</p>
+                <p class="text-violet-400 font-bold mt-1" id="myRankScore">-</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="gc overflow-hidden">
+            <div class="px-5 py-3 border-b border-violet-400/10 flex items-center justify-between">
+              <h3 class="font-semibold text-white text-sm">All My Results</h3>
+              <div id="myAvgBadge" class="badge bv2" style="display:none">Avg: 0%</div>
+            </div>
+            <table class="tbl">
+              <thead><tr><th>Type</th><th>Subject</th><th>Course</th><th>Marks</th><th>%</th><th>Grade</th></tr></thead>
+              <tbody id="resultsBody"><tr><td colspan="6" class="text-center py-10 text-slate-600">Select a course to view</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ONLINE EXAMS -->
+      <div id="sec-exams" class="sec">
+        <div id="examListView">
+          <div id="examCards" class="space-y-4">
+            <div class="gc p-6 text-center text-slate-600">Loading available exams...</div>
+          </div>
+        </div>
+        <!-- Exam Interface (hidden until exam starts) -->
+        <div id="examInterface" style="display:none;">
+          <div class="gc p-5 mb-4">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h3 id="examIntTitle" class="font-bold text-white text-lg">Exam Title</h3>
+                <p class="text-slate-500 text-xs mt-0.5" id="examIntMeta">Course • Questions</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-center">
+                  <div id="timerDisplay" class="timer-box">00:00</div>
+                  <div class="text-slate-600 text-xs mt-0.5">Time Left</div>
+                </div>
+                <button onclick="confirmSubmitExam()" class="btn bg2">Submit Exam</button>
+              </div>
+            </div>
+            <div class="mt-3 pbar"><div id="examProgress" class="pfill" style="width:0%"></div></div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+            <div class="lg:col-span-3 gc p-5">
+              <div id="questionArea"></div>
+              <div class="flex items-center justify-between mt-5">
+                <button onclick="prevQ()" class="btn bv">← Previous</button>
+                <span id="qCounter" class="text-slate-500 text-sm">Q 1 / 10</span>
+                <button onclick="nextQ()" class="btn bv">Next →</button>
+              </div>
+            </div>
+            <div class="gc p-4">
+              <p class="text-xs text-slate-500 font-semibold mb-3 uppercase tracking-wider">Question Palette</p>
+              <div id="qPalette" class="grid grid-cols-5 gap-1.5"></div>
+              <div class="mt-4 space-y-1.5 text-xs text-slate-600">
+                <div class="flex items-center gap-2"><div class="w-4 h-4 rounded bg-violet-500/20 border border-violet-400/40"></div>Answered</div>
+                <div class="flex items-center gap-2"><div class="w-4 h-4 rounded bg-slate-800 border border-violet-400/15"></div>Not answered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Result View -->
+        <div id="examResultView" style="display:none;" class="gc p-8 text-center max-w-lg mx-auto">
+          <div class="text-5xl mb-4" id="resultEmoji">🎉</div>
+          <h3 class="text-2xl font-bold text-white mb-2" id="resultTitle">Exam Completed!</h3>
+          <p class="text-slate-400 text-sm mb-6" id="resultSubtitle">Your score has been recorded.</p>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="p-4 rounded-xl bg-violet-400/5 border border-violet-400/15">
+              <div class="text-violet-400 font-bold text-xl" id="resultScore">0</div>
+              <div class="text-slate-600 text-xs mt-0.5">Score</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-400/5 border border-green-400/15">
+              <div class="text-green-400 font-bold text-xl" id="resultPct">0%</div>
+              <div class="text-slate-600 text-xs mt-0.5">Percentage</div>
+            </div>
+            <div class="p-4 rounded-xl bg-yellow-400/5 border border-yellow-400/15">
+              <div class="text-yellow-400 font-bold text-xl" id="resultGrade">-</div>
+              <div class="text-slate-600 text-xs mt-0.5">Grade</div>
+            </div>
+          </div>
+          <button onclick="backToExamList()" class="btn bp w-full justify-center">Back to Exams</button>
+        </div>
+      </div>
+
+      <!-- DOWNLOADS -->
+      <div id="sec-downloads" class="sec">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- ID Card -->
+          <div class="gc p-6 flex flex-col items-center text-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-violet-500/15 border border-violet-400/20 flex items-center justify-center">
+              <svg class="w-7 h-7 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-white text-sm mb-1">Student ID Card</h4>
+              <p class="text-slate-500 text-xs mb-4">Download your student identity card as PDF</p>
+            </div>
+            <button onclick="downloadIDCard()" class="btn bp w-full justify-center">Download ID Card</button>
+          </div>
+
+          <!-- Certificate -->
+          <div class="gc p-6 flex flex-col gap-4">
+            <div class="flex flex-col items-center text-center gap-3">
+              <div class="w-14 h-14 rounded-2xl bg-green-500/15 border border-green-400/20 flex items-center justify-center">
+                <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-white text-sm mb-1">Course Certificate</h4>
+                <p class="text-slate-500 text-xs">Available only after teacher issues certificate on course completion</p>
+              </div>
+            </div>
+            <div class="w-full space-y-2">
+              <select id="certCourse" class="inp text-xs" onchange="checkCertStatus()"><option value="">Select Course</option></select>
+              <div id="certStatusBox" class="hidden"></div>
+              <button id="certDownloadBtn" onclick="downloadCert()" class="btn bg2 w-full justify-center hidden">⬇ Download Certificate</button>
+            </div>
+          </div>
+
+          <!-- Report Card -->
+          <div class="gc p-6 flex flex-col items-center text-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-500/15 border border-yellow-400/20 flex items-center justify-center">
+              <svg class="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-white text-sm mb-1">Report Card</h4>
+              <p class="text-slate-500 text-xs mb-4">Download your complete marks report PDF</p>
+            </div>
+            <div class="w-full space-y-2">
+              <select id="reportCourse" class="inp text-xs"><option value="">Select Course</option></select>
+              <button onclick="downloadReport()" class="btn bw w-full justify-center">Download Report</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Certificates List -->
+        <div class="gc p-5 mt-5">
+          <h3 class="font-semibold text-white text-sm mb-4">My Certificates</h3>
+          <div id="myCertsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="text-slate-600 text-sm text-center py-6 col-span-full">Loading your certificates...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY FEES -->
+      <div id="sec-fees" class="sec">
+        <!-- Summary cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Total Fees</div><div id="myFeesTotal" class="text-2xl font-bold text-violet-400">₹0</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Amount Paid</div><div id="myFeesPaid" class="text-2xl font-bold text-green-400">₹0</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Balance Due</div><div id="myFeesDue" class="text-2xl font-bold text-red-400">₹0</div></div>
+          <div class="sc"><div class="text-xs text-slate-500 mb-1">Discount</div><div id="myFeesDiscount" class="text-2xl font-bold text-yellow-400">₹0</div></div>
+        </div>
+        <!-- Course-wise fee details -->
+        <div id="myFeesList" class="space-y-4">
+          <div class="gc p-6 text-center text-slate-600">Loading fee details...</div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div id="sec-notifications" class="sec">
+        <div id="notifList" class="space-y-3 max-w-2xl">
+          <div class="gc p-6 text-center text-slate-600">Loading notifications...</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="modalBg" class="mbg hidden" onclick="closeModal(event)">
+  <div id="modalBox" class="mbox" onclick="event.stopPropagation()"></div>
+</div>
+<div id="toasts"></div>
+
+<script>
+(async () => {
+const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+const { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBOSBr1wtIx718p8dkxYju1zZNc-cdFW9I",
+  authDomain: "vision-it-institute-8e414.firebaseapp.com",
+  databaseURL: "https://vision-it-institute-8e414-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vision-it-institute-8e414",
+  storageBucket: "vision-it-institute-8e414.firebasestorage.app",
+  messagingSenderId: "99771671635",
+  appId: "1:99771671635:web:5347820382d5802dff92a6"
+};
+
+const app = initializeApp(firebaseConfig, "VisionStudentApp");
+const db = getFirestore(app);
+
+// ── GLOBALS ──────────────────────────────────────────────────
+let session = null;
+let myEnrollments = [], myCourseDocs = [];
+let notifUnsub = null, hwUnsub = null;
+let chartPerf = null, chartMyResults = null;
+// Exam state
+let activeExam = null, examAnswers = {}, currentQIdx = 0;
+let examTimer = null, tabSwitchCount = 0;
+// Homework state
+let activeHw = null, hwAnswers = {};
+
+// ── INIT ─────────────────────────────────────────────────────
+async function initApp() {
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  const stored = localStorage.getItem('vims_student_session');
+  if (stored) {
+    try {
+      const s = JSON.parse(stored);
+      if (s && s.role === 'student' && s.userId) {
+        const ud = await getDoc(doc(db,'users',s.userId));
+        if (ud.exists() && ud.data().isActive && ud.data().role === 'student') {
+          session = s;
+          showApp();
+          return;
+        }
+      }
+    } catch(e) {}
+    localStorage.removeItem('vims_student_session');
+  }
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+window.handleLogin = async () => {
+  const userId = document.getElementById('loginId').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (!userId || !password) return toast('Enter your credentials','error');
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  try {
+    const ud = await getDoc(doc(db,'users',userId));
+    if (!ud.exists()) { toast('User not found','error'); return; }
+    const data = ud.data();
+    if (data.password !== password) { toast('Wrong password','error'); return; }
+    if (!data.isActive) { toast('Account disabled. Contact admin.','error'); return; }
+    if (data.role !== 'student') { toast('Not a student account','error'); return; }
+    session = { userId, name:data.name, role:'student', profileImage:data.profileImage||'' };
+    localStorage.setItem('vims_student_session', JSON.stringify(session));
+    toast('Welcome, ' + data.name + '!','success');
+    showApp();
+  } catch(e) { toast('Error: ' + e.message,'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+};
+
+// ── SHOW APP ─────────────────────────────────────────────────
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  document.getElementById('sidebar').style.transform = window.innerWidth >= 1024 ? 'translateX(0)' : 'translateX(-100%)';
+  document.getElementById('sbName').textContent = session.name;
+  const av = session.profileImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(session.name) + '&background=7c3aed&color=fff';
+  document.getElementById('sbAvatar').src = av;
+  document.getElementById('profileImg').src = av;
+  document.getElementById('hwDateFilter').value = new Date().toISOString().split('T')[0];
+  loadProfile();
+  loadMyEnrollments();
+  listenNotifications();
+  listenHomeworkUpdates();
+}
+
+window.logout = () => {
+  if (activeExam) { if (!confirm('You are in an exam! Exit anyway?')) return; clearInterval(examTimer); }
+  if (!confirm('Logout?')) return;
+  localStorage.removeItem('vims_student_session');
+  if (notifUnsub) notifUnsub();
+  if (hwUnsub) hwUnsub();
+  location.reload();
+};
+
+window.toggleSb = () => {
+  const sb = document.getElementById('sidebar');
+  sb.style.transform = sb.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+};
+
+// ── NAVIGATION ───────────────────────────────────────────────
+window.showSec = (sec) => {
+  if (activeExam && sec !== 'exams') { toast('Please submit your exam first','error'); return; }
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + sec).classList.add('active');
+  document.querySelectorAll('.ni').forEach(n => { if (n.getAttribute('onclick')?.includes("'" + sec + "'")) n.classList.add('active'); });
+  const titles = {dashboard:'Dashboard',profile:'My Profile',courses:'My Courses',batches:'My Batches',topics:'Topic-wise Classes',schedule:'Class Schedule',materials:'Class Materials',videos:'🎬 Online Classes',curriculum:'📋 Curriculum',attendance:'My Attendance',homework:'Daily Homework',results:'Results & Rank',exams:'Online Exams',downloads:'Downloads',fees:'My Fees',notifications:'Notifications'};
+  document.getElementById('pgTitle').textContent = titles[sec]||sec;
+  if (window.innerWidth < 1024) document.getElementById('sidebar').style.transform = 'translateX(-100%)';
+  if (sec === 'attendance') { populateAttFilter(); loadMyAtt(); }
+  if (sec === 'results') { populateResultFilter(); }
+  if (sec === 'exams') loadExams();
+  if (sec === 'downloads') populateDownloadSelects();
+  if (sec === 'topics') populateStudentTopicFilter();
+  if (sec === 'schedule') populateStudentSchedFilter();
+  if (sec === 'materials') populateStudentMatFilters();
+  if (sec === 'videos') initStudentVideos();
+  if (sec === 'curriculum') initStudentCurriculum();
+  if (sec === 'homework') { populateStudentHwFilters(); loadStudentHomework(); }
+  if (sec === 'batches') loadStudentBatches();
+  if (sec === 'fees') loadMyFees();
+};
+
+// ── PROFILE ───────────────────────────────────────────────────
+async function loadProfile() {
+  const d = await getDoc(doc(db,'users',session.userId));
+  if (!d.exists()) return;
+  const data = d.data();
+  document.getElementById('pName').value = data.name||'';
+  document.getElementById('pUserId').value = data.userId||'';
+  document.getElementById('pPhone').value = data.phone||'';
+  document.getElementById('pGuardian').value = data.guardianName||'';
+  document.getElementById('pAddress').value = data.address||'';
+  document.getElementById('profName').textContent = data.name;
+  document.getElementById('profId').textContent = data.userId;
+}
+
+window.saveProfile = async () => {
+  const name = document.getElementById('pName').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+  const guardianName = document.getElementById('pGuardian').value.trim();
+  const address = document.getElementById('pAddress').value.trim();
+  const pass = document.getElementById('pPass').value;
+  if (!name) return toast('Name is required','error');
+  try {
+    const upd = {name, phone, guardianName, address, updatedAt:serverTimestamp()};
+    if (pass) upd.password = pass;
+    await updateDoc(doc(db,'users',session.userId), upd);
+    session.name = name;
+    localStorage.setItem('vims_student_session', JSON.stringify(session));
+    document.getElementById('sbName').textContent = name;
+    document.getElementById('profName').textContent = name;
+    toast('Profile saved!','success');
+  } catch(e) { toast('Error: ' + e.message,'error'); }
+};
+
+window.uploadPhoto = async (input) => {
+  const file = input.files[0]; if (!file) return;
+  toast('Uploading...','info');
+  const fd = new FormData(); fd.append('file',file); fd.append('upload_preset','ml_default');
+  const res = await fetch('https://api.cloudinary.com/v1_1/dbfdguefj/image/upload',{method:'POST',body:fd});
+  const data = await res.json();
+  if (data.secure_url) {
+    await updateDoc(doc(db,'users',session.userId), {profileImage:data.secure_url});
+    document.getElementById('profileImg').src = data.secure_url;
+    document.getElementById('sbAvatar').src = data.secure_url;
+    session.profileImage = data.secure_url;
+    localStorage.setItem('vims_student_session', JSON.stringify(session));
+    toast('Photo updated!','success');
+  } else toast('Upload failed','error');
+};
+
+// ── ENROLLMENTS ───────────────────────────────────────────────
+async function loadMyEnrollments() {
+  const snap = await getDocs(query(collection(db,'enrollments'), where('studentId','==',session.userId)));
+  myEnrollments = snap.docs.map(d => ({id:d.id,...d.data()}));
+  // Load course docs
+  myCourseDocs = [];
+  for (const en of myEnrollments) {
+    try {
+      const cd = await getDoc(doc(db,'courses',en.courseId));
+      if (cd.exists()) myCourseDocs.push({id:cd.id,...cd.data()});
+    } catch(e) {}
+  }
+  renderCourses();
+  loadDashboard();
+  renderDashCourseList();
+}
+
+function renderCourses() {
+  const grid = document.getElementById('coursesGrid');
+  if (!myCourseDocs.length) {
+    grid.innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full">No courses enrolled yet. Use a join code to enroll!</div>';
+    return;
+  }
+  grid.innerHTML = myCourseDocs.map(c => {
+    const netFee = c.netFee || c.fees || 0;
+    const discAmt = c.discountAmt || 0;
+    return `
+    <div class="gc p-5 hover:border-violet-400/25 transition-all">
+      ${c.bannerUrl ? `<img src="${c.bannerUrl}" class="w-full h-28 object-cover rounded-lg mb-3"/>` : `<div class="w-full h-28 rounded-lg mb-3 flex items-center justify-center bg-gradient-to-br from-violet-400/15 to-rose-400/15"><span class="text-3xl">📚</span></div>`}
+      <h4 class="font-bold text-white text-sm mb-1">${c.name}</h4>
+      <p class="text-slate-500 text-xs mb-1">${c.subject||''}</p>
+      <p class="text-slate-600 text-xs mb-2">Teacher: <span class="text-violet-400">${c.teacherName||'-'}</span></p>
+      ${c.duration ? `<p class="text-slate-600 text-xs mb-2">⏱ ${c.duration}</p>` : ''}
+      ${netFee > 0 ? `<div class="flex items-center gap-2 mt-2">
+        <span class="text-violet-400 font-bold text-sm">₹${netFee.toLocaleString('en-IN')}</span>
+        ${discAmt > 0 ? `<span class="text-slate-600 line-through text-xs">₹${(c.fees||0).toLocaleString('en-IN')}</span><span class="badge bw2 text-xs">🏷 ${c.discountType==='percent'?c.discountAmount+'% off':'₹'+discAmt+' off'}</span>` : ''}
+      </div>` : '<p class="text-green-400 text-xs mt-2">Free Course</p>'}
+    </div>`;
+  }).join('');
+}
+
+function renderDashCourseList() {
+  const el = document.getElementById('dashCourseList');
+  if (!myCourseDocs.length) { el.innerHTML = '<p class="text-slate-600 text-xs text-center py-3">Not enrolled in any course yet</p>'; return; }
+  el.innerHTML = myCourseDocs.map(c => `
+    <div class="flex items-center gap-3 p-2.5 rounded-xl bg-violet-400/5 border border-violet-400/10">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400/20 to-rose-400/20 flex items-center justify-center text-sm">📚</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-white text-xs font-semibold truncate">${c.name}</p>
+        <p class="text-slate-600 text-xs">${c.teacherName||'-'}</p>
+      </div>
+      <span class="badge bg3 text-xs">Enrolled</span>
+    </div>
+  `).join('');
+}
+
+async function loadDashboard() {
+  document.getElementById('dCourses').textContent = myCourseDocs.length;
+  if (session) {
+    const attSnap = await getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId)));
+    const atts = attSnap.docs.map(d => d.data());
+    const pct = atts.length ? ((atts.filter(a=>a.status==='present').length/atts.length)*100).toFixed(0) : 0;
+    document.getElementById('dAtt').textContent = pct + '%';
+    renderPerfChart();
+    loadTodayScheduleDash();
+    loadPendingHwDash();
+  }
+}
+
+async function renderPerfChart() {
+  const snap = await getDocs(query(collection(db,'tests'), where('studentId','==',session.userId)));
+  const tests = snap.docs.map(d => d.data());
+  const daily = tests.filter(t=>t.type==='daily'), monthly = tests.filter(t=>t.type==='monthly'), final = tests.filter(t=>t.type==='final');
+  const avg = arr => arr.length ? parseFloat((arr.reduce((s,t)=>s+(t.marks/t.total)*100,0)/arr.length).toFixed(1)) : 0;
+  if (chartPerf) chartPerf.destroy();
+  const ctx = document.getElementById('chartPerf').getContext('2d');
+  chartPerf = new Chart(ctx, {type:'radar',data:{labels:['Daily Tests','Monthly Tests','Final Exam','Attendance'],datasets:[{label:'My Performance',data:[avg(daily),avg(monthly),avg(final),parseFloat(document.getElementById('dAtt').textContent)||0],backgroundColor:'rgba(167,139,250,0.15)',borderColor:'#a78bfa',borderWidth:2,pointBackgroundColor:'#a78bfa',pointRadius:4}]},options:{responsive:true,scales:{r:{ticks:{color:'#3730a3',backdropColor:'transparent'},grid:{color:'rgba(167,139,250,0.12)'},pointLabels:{color:'#64748b',font:{size:11}},min:0,max:100}},plugins:{legend:{display:false}}}});
+}
+
+// ── JOIN COURSE ───────────────────────────────────────────────
+window.joinCourse = async () => {
+  const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+  if (code.length !== 6) return toast('Enter a valid 6-character code','error');
+  await doJoin(code, 'joinResult');
+};
+window.joinCourse2 = async () => {
+  const code = document.getElementById('joinCode2').value.trim().toUpperCase();
+  if (code.length !== 6) return toast('Enter a valid 6-character code','error');
+  await doJoin(code, null);
+};
+
+async function doJoin(code, resultElId) {
+  const snap = await getDocs(query(collection(db,'courses'), where('joinCode','==',code)));
+  const resultEl = resultElId ? document.getElementById(resultElId) : null;
+  if (snap.empty) {
+    if (resultEl) { resultEl.innerHTML = '<p class="text-red-400 text-xs">❌ Invalid join code. Check with your teacher.</p>'; resultEl.classList.remove('hidden'); }
+    else toast('Invalid join code','error'); return;
+  }
+  const course = {id:snap.docs[0].id,...snap.docs[0].data()};
+  // Check duplicate
+  const ex = myEnrollments.find(e => e.courseId === course.id);
+  if (ex) {
+    if (resultEl) { resultEl.innerHTML = `<p class="text-yellow-400 text-xs">⚠️ Already enrolled in <strong>${course.name}</strong></p>`; resultEl.classList.remove('hidden'); }
+    else toast('Already enrolled in this course','error'); return;
+  }
+  // Enroll
+  await addDoc(collection(db,'enrollments'), {
+    studentId:session.userId, studentName:session.name, courseId:course.id, courseName:course.name,
+    teacherId:course.teacherId, teacherName:course.teacherName||'', joinCode:code, enrolledAt:serverTimestamp()
+  });
+  if (resultEl) { resultEl.innerHTML = `<p class="text-green-400 text-xs">✅ Successfully enrolled in <strong>${course.name}</strong>!</p>`; resultEl.classList.remove('hidden'); }
+  toast('Enrolled in ' + course.name + '!','success');
+  await loadMyEnrollments();
+}
+
+// ── CURRICULUM (Student Read-Only View) ──────────────────────
+async function initStudentCurriculum() {
+  const sel = document.getElementById('sCurCourse');
+  sel.innerHTML = '<option value="">Select Course</option>';
+  // Populate from enrolled courses
+  if (enrolledCourses && enrolledCourses.length) {
+    enrolledCourses.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+  } else {
+    const snap = await getDocs(query(collection(db,'enrollments'),where('studentId','==',session.userId)));
+    snap.docs.forEach(d => { const e=d.data(); sel.innerHTML += `<option value="${e.courseId}">${e.courseName}</option>`; });
+  }
+  document.getElementById('sCurSummary').classList.add('hidden');
+  document.getElementById('sCurUnits').innerHTML = '';
+  document.getElementById('sCurEmpty').style.display = 'block';
+}
+
+window.loadStudentCurriculum = async () => {
+  const courseId = document.getElementById('sCurCourse').value;
+  const summary = document.getElementById('sCurSummary');
+  const unitsEl = document.getElementById('sCurUnits');
+  const emptyEl = document.getElementById('sCurEmpty');
+  summary.classList.add('hidden'); unitsEl.innerHTML = ''; emptyEl.style.display='block';
+  if (!courseId) return;
+
+  emptyEl.innerHTML = '<div class="text-3xl mb-2">⏳</div><p>Loading...</p>';
+
+  const cSnap = await getDocs(query(collection(db,'curriculum'),where('courseId','==',courseId)));
+  if (cSnap.empty) {
+    emptyEl.innerHTML = '<div class="text-4xl mb-3">📋</div><p class="text-slate-500">Curriculum not set up yet for this course.</p>';
+    return;
+  }
+
+  const cur = {id: cSnap.docs[0].id, ...cSnap.docs[0].data()};
+  emptyEl.style.display = 'none';
+
+  // Fill summary
+  document.getElementById('sCurTitle').textContent = cur.title || '';
+  document.getElementById('sCurMeta').textContent = [cur.subject, cur.level, cur.totalDuration, cur.board].filter(Boolean).join(' · ');
+
+  // Objectives
+  if (cur.objectives && cur.objectives.length) {
+    document.getElementById('sCurObjectives').classList.remove('hidden');
+    document.getElementById('sCurObjList').innerHTML = cur.objectives.map(o => `<li class="flex items-start gap-2 text-xs text-slate-400"><span class="text-violet-400 mt-0.5">✦</span>${o}</li>`).join('');
+  }
+
+  summary.classList.remove('hidden');
+
+  // Load units and lessons
+  const uSnap = await getDocs(query(collection(db,'curriculumUnits'),where('curriculumId','==',cur.id)));
+  const units = uSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+
+  let totalLessons=0, doneLessons=0;
+  unitsEl.innerHTML = '';
+
+  for (const unit of units) {
+    const lSnap = await getDocs(query(collection(db,'curriculumLessons'),where('unitId','==',unit.id)));
+    const lessons = lSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+    totalLessons += lessons.length;
+    doneLessons += lessons.filter(l=>l.status==='done').length;
+    unitsEl.appendChild(buildStudentUnitCard(unit, lessons));
+  }
+
+  // Update stats
+  const pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
+  document.getElementById('sCurBigPct').textContent = pct + '%';
+  document.getElementById('sCurProgBar').style.width = pct + '%';
+  document.getElementById('sCurProgLabel').textContent = `${doneLessons} of ${totalLessons} lessons completed`;
+  document.getElementById('sCurStatU').textContent = units.length;
+  document.getElementById('sCurStatL').textContent = totalLessons;
+  document.getElementById('sCurStatD').textContent = doneLessons;
+};
+
+function buildStudentUnitCard(unit, lessons) {
+  const done = lessons.filter(l=>l.status==='done').length;
+  const pct = lessons.length ? Math.round(done/lessons.length*100) : 0;
+  const r=22, circ=2*Math.PI*r, offset=circ-(pct/100)*circ;
+
+  const div = document.createElement('div');
+  div.className = 'scur-unit';
+  div.innerHTML = `
+    <div class="scur-unit-hdr" onclick="toggleStudentUnit('${unit.id}')">
+      <div class="progress-ring-wrap">
+        <svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg)">
+          <circle fill="none" stroke="rgba(167,139,250,0.12)" stroke-width="4" cx="26" cy="26" r="${r}"/>
+          <circle fill="none" stroke="#a78bfa" stroke-width="4" stroke-linecap="round" cx="26" cy="26" r="${r}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#a78bfa;">${pct}%</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 text-xs font-bold mono">Unit ${unit.order||''}</span>
+          ${unit.duration ? `<span class="text-slate-600 text-xs">· ${unit.duration}</span>` : ''}
+        </div>
+        <h4 class="text-white font-bold text-sm mt-0.5">${unit.title}</h4>
+        <p class="text-slate-500 text-xs">${lessons.length} lessons · ${done} completed</p>
+      </div>
+      <span class="text-slate-500 transition-transform" id="suarrow-${unit.id}">▼</span>
+    </div>
+    <div id="sUnitBody-${unit.id}" class="hidden">
+      ${lessons.length
+        ? lessons.map(l => buildStudentLessonRow(l)).join('')
+        : '<div class="p-4 text-center text-slate-600 text-xs">No lessons added yet</div>'}
+    </div>`;
+  return div;
+}
+
+function buildStudentLessonRow(l) {
+  const dotClass = {planned:'sl-planned', ongoing:'sl-ongoing', done:'sl-done'}[l.status]||'sl-planned';
+  const statusBg = l.status==='done' ? 'rgba(74,222,128,0.06)' : l.status==='ongoing' ? 'rgba(251,191,36,0.05)' : 'transparent';
+  return `<div class="scur-lesson" style="background:${statusBg}">
+    <div class="sl-dot ${dotClass} flex-shrink-0 mt-0.5"></div>
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-slate-500 text-xs mono">L${l.order||''}</span>
+        <p class="text-sm ${l.status==='done'?'text-slate-400 line-through':'text-slate-200'} font-medium">${l.title}</p>
+        ${l.type ? `<span class="text-xs px-1.5 py-0.5 rounded" style="background:rgba(167,139,250,0.1);color:#c4b5fd">${l.type}</span>` : ''}
+        ${l.duration ? `<span class="text-slate-600 text-xs">⏱ ${l.duration}</span>` : ''}
+        ${l.scheduledDate ? `<span class="text-slate-600 text-xs">📅 ${l.scheduledDate}</span>` : ''}
+      </div>
+      ${l.description ? `<p class="text-slate-500 text-xs mt-0.5 leading-relaxed">${l.description}</p>` : ''}
+      <!-- Resource quick-access chips -->
+      <div class="flex flex-wrap gap-1.5 mt-1.5">
+        ${l.youtubeUrl ? `<span class="res-chip rc-yt" onclick="openLessonVideo('${l.youtubeUrl.replace(/'/g,"\\'")}','${l.title.replace(/'/g,"\\'")}')">▶ Watch Video</span>` : ''}
+        ${l.playlistId ? `<span class="res-chip rc-mat" onclick="openLessonPlaylist('${l.playlistId}')">🎬 Open Playlist</span>` : ''}
+      </div>
+    </div>
+    <span class="text-xs flex-shrink-0 px-2 py-1 rounded-full font-semibold ${l.status==='done'?'text-green-400':l.status==='ongoing'?'text-yellow-400':'text-slate-500'}" style="background:rgba(255,255,255,0.04)">${l.status==='done'?'✓ Done':l.status==='ongoing'?'● Ongoing':'Planned'}</span>
+  </div>`;
+}
+
+window.toggleStudentUnit = (unitId) => {
+  const body = document.getElementById('sUnitBody-'+unitId);
+  const arrow = document.getElementById('suarrow-'+unitId);
+  if (body.classList.contains('hidden')) {
+    body.classList.remove('hidden');
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+  } else {
+    body.classList.add('hidden');
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+};
+
+window.openLessonVideo = (url, title) => {
+  const vid = extractYtIdSt(url);
+  if (!vid) { window.open(url,'_blank'); return; }
+  showModal(`<h3 class="text-sm font-bold text-white mb-3">${title}</h3>
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:0.75rem;">
+      <iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:0.75rem;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <button onclick="closeModal()" class="btn btn-primary w-full justify-center mt-4">Close</button>`);
+};
+
+window.openLessonPlaylist = (playlistId) => {
+  // Navigate to videos section and open the playlist
+  showSec('videos');
+  setTimeout(async () => {
+    const plDoc = await getDoc(doc(db,'playlists',playlistId));
+    if (!plDoc.exists()) return;
+    const pl = {id:playlistId,...plDoc.data()};
+    // Set course filter
+    const sel = document.getElementById('vidCourseFilter');
+    if (sel) {
+      sel.value = pl.courseId;
+      await loadStudentPlaylists();
+      // Add the playlist to cache if not there
+      if (!studentAllPlaylists.find(p=>p.id===playlistId)) studentAllPlaylists.push(pl);
+      await openStudentPlaylist(playlistId);
+    }
+  }, 300);
+};
+
+// ── ONLINE CLASSES (Student) ──────────────────────────────────
+let studentAllPlaylists = [];
+let studentCurrentPlaylistVideos = [];
+let studentCurrentVideoIdx = -1;
+let studentWatched = new Set();
+
+function extractYtIdSt(url) {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+  ];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
+function ytThumbSt(id) { return `https://img.youtube.com/vi/${id}/mqdefault.jpg`; }
+function ytEmbedSt(id, auto=1) { return `https://www.youtube.com/embed/${id}?autoplay=${auto}&rel=0&modestbranding=1`; }
+
+async function initStudentVideos() {
+  // Populate course filter from enrolled courses
+  const sel = document.getElementById('vidCourseFilter');
+  sel.innerHTML = '<option value="">Select Course</option>';
+  if (enrolledCourses && enrolledCourses.length) {
+    enrolledCourses.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+  } else {
+    // Fallback: load from enrollments
+    const snap = await getDocs(query(collection(db,'enrollments'), where('studentId','==',session.userId)));
+    snap.docs.forEach(d => {
+      const e = d.data();
+      sel.innerHTML += `<option value="${e.courseId}">${e.courseName}</option>`;
+    });
+  }
+  // Reset to browse view
+  document.getElementById('vidBrowseView').style.display = 'block';
+  document.getElementById('vidPlayerView').style.display = 'none';
+  document.getElementById('chapterPills').classList.add('hidden');
+  document.getElementById('studentPlaylistGrid').innerHTML = `<div class="gc p-8 text-center text-slate-600 col-span-full"><div class="text-4xl mb-3">🎬</div><p>Select a course to view online classes</p></div>`;
+}
+
+window.loadStudentPlaylists = async () => {
+  const courseId = document.getElementById('vidCourseFilter').value;
+  const grid = document.getElementById('studentPlaylistGrid');
+  const pillsRow = document.getElementById('chapterPills');
+  if (!courseId) {
+    grid.innerHTML = `<div class="gc p-8 text-center text-slate-600 col-span-full"><div class="text-4xl mb-3">🎬</div><p>Select a course to view online classes</p></div>`;
+    pillsRow.classList.add('hidden');
+    return;
+  }
+  grid.innerHTML = '<div class="gc p-6 text-center text-slate-600 col-span-full">Loading playlists...</div>';
+  const snap = await getDocs(query(collection(db,'playlists'), where('courseId','==',courseId), where('visibility','==','published')));
+  studentAllPlaylists = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (a.order||0)-(b.order||0));
+
+  if (!studentAllPlaylists.length) {
+    grid.innerHTML = `<div class="gc p-8 text-center col-span-full"><div class="text-4xl mb-3">📭</div><p class="text-slate-400">No online classes available yet for this course.</p></div>`;
+    pillsRow.classList.add('hidden');
+    return;
+  }
+
+  // Build chapter pills
+  const chapters = [...new Set(studentAllPlaylists.map(p => p.chapterName).filter(Boolean))];
+  let pillsHtml = `<button class="chapter-pill active" onclick="filterByChapter('')" id="pillAll">📚 All</button>`;
+  chapters.forEach(ch => {
+    pillsHtml += `<button class="chapter-pill" onclick="filterByChapter('${ch.replace(/'/g,"\\'")}')">📖 ${ch}</button>`;
+  });
+  pillsRow.innerHTML = pillsHtml;
+  pillsRow.classList.remove('hidden');
+
+  renderStudentPlaylistGrid(studentAllPlaylists);
+};
+
+window.filterByChapter = (chapter) => {
+  // Update pill styles
+  document.querySelectorAll('.chapter-pill').forEach(p => p.classList.remove('active'));
+  if (!chapter) {
+    document.getElementById('pillAll')?.classList.add('active');
+    renderStudentPlaylistGrid(studentAllPlaylists);
+  } else {
+    document.querySelectorAll('.chapter-pill').forEach(p => { if (p.textContent.includes(chapter)) p.classList.add('active'); });
+    renderStudentPlaylistGrid(studentAllPlaylists.filter(p => p.chapterName === chapter));
+  }
+};
+
+function renderStudentPlaylistGrid(playlists) {
+  const grid = document.getElementById('studentPlaylistGrid');
+  if (!playlists.length) {
+    grid.innerHTML = `<div class="gc p-6 text-center text-slate-600 col-span-full">No playlists in this chapter</div>`;
+    return;
+  }
+  grid.innerHTML = playlists.map(pl => {
+    const vCount = pl.videoCount || 0;
+    const thumb = pl.firstVideoId ? ytThumbSt(pl.firstVideoId) : '';
+    return `<div class="playlist-thumb-card" onclick="openStudentPlaylist('${pl.id}')">
+      <div class="relative">
+        ${thumb
+          ? `<img src="${thumb}" class="w-full h-44 object-cover" onerror="this.parentElement.innerHTML='<div class=\\"w-full h-44 bg-gradient-to-br from-violet-900/40 to-indigo-900/40 flex items-center justify-center\\"><span class=\\"text-6xl\\">🎬</span></div>'"/>`
+          : `<div class="w-full h-44 bg-gradient-to-br from-violet-900/40 to-indigo-900/40 flex items-center justify-center"><span class="text-6xl">🎬</span></div>`}
+        <!-- Video count badge overlay -->
+        <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold" style="background:rgba(0,0,0,0.75);color:#fff">
+          <svg class="w-3 h-3 inline-block mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+          ${vCount} videos
+        </div>
+        <!-- Play button overlay -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity" style="background:rgba(0,0,0,0.4)">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center" style="background:rgba(167,139,250,0.9)">
+            <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        ${pl.chapterName ? `<span class="text-violet-400 text-xs font-semibold uppercase tracking-wide">📖 ${pl.chapterName}</span>` : ''}
+        <h4 class="text-white font-bold text-sm mt-1 mb-1 leading-snug">${pl.name}</h4>
+        ${pl.description ? `<p class="text-slate-500 text-xs leading-relaxed line-clamp-2">${pl.description}</p>` : ''}
+        <div class="flex items-center gap-2 mt-3">
+          <div class="flex-1 pbar"><div class="pfill" style="width:0%" id="plprog_${pl.id}"></div></div>
+          <span class="text-slate-600 text-xs">Not started</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openStudentPlaylist = async (playlistId) => {
+  const pl = studentAllPlaylists.find(p => p.id === playlistId);
+  if (!pl) return;
+
+  // Load videos
+  const snap = await getDocs(query(collection(db,'playlistVideos'), where('playlistId','==',playlistId)));
+  studentCurrentPlaylistVideos = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (a.order||0)-(b.order||0));
+
+  if (!studentCurrentPlaylistVideos.length) {
+    toast('This playlist has no videos yet', 'info'); return;
+  }
+
+  // Switch to player view
+  document.getElementById('vidBrowseView').style.display = 'none';
+  document.getElementById('vidPlayerView').style.display = 'block';
+  document.getElementById('vidPlayerTitle').textContent = pl.name;
+  document.getElementById('vidPlayerMeta').textContent = (pl.chapterName ? `📖 ${pl.chapterName} · ` : '') + (pl.courseName || '') + ` · ${studentCurrentPlaylistVideos.length} videos`;
+  document.getElementById('playlistPanelTitle').textContent = pl.name;
+  document.getElementById('playlistPanelCount').textContent = `${studentCurrentPlaylistVideos.length} videos`;
+
+  // Render video list
+  renderStudentVideoList();
+
+  // Auto-play first video
+  playStudentVideo(0);
+};
+
+function renderStudentVideoList() {
+  const list = document.getElementById('studentVideoList');
+  list.innerHTML = studentCurrentPlaylistVideos.map((v, i) => {
+    const thumb = v.videoId ? ytThumbSt(v.videoId) : '';
+    const isWatched = studentWatched.has(v.id);
+    return `<div class="vid-list-item ${i === studentCurrentVideoIdx ? 'playing' : ''}" id="svi-${i}" onclick="playStudentVideo(${i})">
+      <div class="relative flex-shrink-0">
+        ${thumb
+          ? `<img src="${thumb}" class="vid-thumb-sm" onerror="this.style.display='none'"/>`
+          : `<div class="vid-thumb-sm flex items-center justify-center text-lg">🎬</div>`}
+        ${i === studentCurrentVideoIdx
+          ? `<div class="absolute inset-0 flex items-center justify-center rounded" style="background:rgba(167,139,250,0.85)"><svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg></div>`
+          : ''}
+        ${isWatched && i !== studentCurrentVideoIdx
+          ? `<div class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style="background:#4ade80"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>`
+          : ''}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-semibold truncate ${i === studentCurrentVideoIdx ? 'text-violet-300' : 'text-slate-200'}">${v.title}</p>
+        <div class="flex items-center gap-2 mt-0.5">
+          ${v.duration ? `<span class="text-slate-600 text-xs">${v.duration}</span>` : ''}
+          <span class="text-slate-700 text-xs">#${i+1}</span>
+          ${isWatched ? `<span class="text-green-400 text-xs">✓ Watched</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.playStudentVideo = (idx) => {
+  if (idx < 0 || idx >= studentCurrentPlaylistVideos.length) return;
+  studentCurrentVideoIdx = idx;
+  const v = studentCurrentPlaylistVideos[idx];
+  if (!v.videoId) { toast('Invalid video', 'error'); return; }
+
+  // Mark as watched
+  studentWatched.add(v.id);
+
+  // Update iframe
+  document.getElementById('studentVideoFrame').innerHTML = `<iframe class="yt-frame" src="${ytEmbedSt(v.videoId, 1)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+
+  // Update now playing info
+  document.getElementById('nowPlayingVTitle').textContent = v.title;
+  document.getElementById('nowPlayingVDesc').textContent = v.description || '';
+  document.getElementById('nowPlayingVDur').textContent = v.duration ? `⏱ ${v.duration}` : '';
+  document.getElementById('nowPlayingVNum').textContent = `Video ${idx+1} of ${studentCurrentPlaylistVideos.length}`;
+  document.getElementById('nowPlayingBox').classList.remove('hidden');
+
+  // Update progress
+  const pct = Math.round((studentWatched.size / studentCurrentPlaylistVideos.length) * 100);
+  document.getElementById('vidProgressBar').style.width = pct + '%';
+  document.getElementById('vidProgressLabel').textContent = `${studentWatched.size} / ${studentCurrentPlaylistVideos.length} watched`;
+
+  // Update prev/next buttons
+  document.getElementById('prevVidBtn').disabled = idx === 0;
+  document.getElementById('nextVidBtn').disabled = idx === studentCurrentPlaylistVideos.length - 1;
+
+  // Re-render list to update playing highlight
+  renderStudentVideoList();
+
+  // Scroll active item into view
+  setTimeout(() => {
+    const el = document.getElementById('svi-' + idx);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 100);
+};
+
+window.navigateVideo = (dir) => {
+  playStudentVideo(studentCurrentVideoIdx + dir);
+};
+
+window.backToPlaylistBrowse = () => {
+  studentCurrentPlaylistVideos = [];
+  studentCurrentVideoIdx = -1;
+  studentWatched = new Set();
+  // Stop video
+  document.getElementById('studentVideoFrame').innerHTML = `<div class="w-full aspect-video rounded-xl bg-slate-950 flex items-center justify-center"><div class="text-center"><div class="text-5xl mb-3">▶️</div><p class="text-slate-500 text-sm">Select a video to start watching</p></div></div>`;
+  document.getElementById('nowPlayingBox').classList.add('hidden');
+  document.getElementById('vidPlayerView').style.display = 'none';
+  document.getElementById('vidBrowseView').style.display = 'block';
+};
+
+// ── ATTENDANCE ────────────────────────────────────────────────
+function populateAttFilter() {
+  const sel = document.getElementById('attCourse');
+  sel.innerHTML = '<option value="">All Courses</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+window.loadMyAtt = async () => {
+  const courseId = document.getElementById('attCourse').value;
+  const month = document.getElementById('attMonth').value;
+  let snap;
+  if (courseId) snap = await getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId), where('courseId','==',courseId)));
+  else snap = await getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId)));
+  let records = snap.docs.map(d => d.data());
+  if (month) records = records.filter(r => (new Date(r.date).getMonth()+1) === parseInt(month));
+  records.sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  const tbody = document.getElementById('attBody');
+  if (!records.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-slate-600">No attendance records found</td></tr>'; }
+  else tbody.innerHTML = records.map(r => `<tr><td class="text-slate-300 text-xs">${r.date}</td><td><span class="badge bv2">${r.courseName||'-'}</span></td><td><span class="badge ${r.status==='present'?'bg3':'br2'}">${r.status}</span></td></tr>`).join('');
+
+  const total = records.length;
+  const present = records.filter(r=>r.status==='present').length;
+  const pct = total ? ((present/total)*100).toFixed(1) : 0;
+  const summaryEl = document.getElementById('attSummary');
+  // Per-course summary
+  const courseMap = {};
+  records.forEach(r => {
+    if (!courseMap[r.courseId]) courseMap[r.courseId] = {name:r.courseName||r.courseId,present:0,total:0};
+    courseMap[r.courseId].total++;
+    if (r.status==='present') courseMap[r.courseId].present++;
+  });
+  summaryEl.innerHTML = `
+    <div class="p-3 rounded-xl bg-violet-400/5 border border-violet-400/10 text-center">
+      <div class="text-violet-400 font-bold text-2xl">${pct}%</div>
+      <div class="text-slate-500 text-xs mt-0.5">Overall Attendance</div>
+      <div class="text-slate-600 text-xs">${present}/${total} classes</div>
+    </div>
+    ${Object.entries(courseMap).map(([id,c]) => {
+      const cp = c.total ? ((c.present/c.total)*100).toFixed(0) : 0;
+      return `<div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-800/40">
+        <span class="text-slate-300 text-xs">${c.name}</span>
+        <span class="badge ${cp>=75?'bg3':cp>=50?'bw2':'br2'}">${cp}%</span>
+      </div>`;
+    }).join('')}`;
+};
+
+// ── RESULTS ───────────────────────────────────────────────────
+function populateResultFilter() {
+  document.getElementById('resultCourse').innerHTML = '<option value="">All Courses</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+window.loadMyResults = async () => {
+  const courseId = document.getElementById('resultCourse').value;
+  // Load tests
+  let tQ = query(collection(db,'tests'), where('studentId','==',session.userId));
+  const tSnap = await getDocs(tQ);
+  let tests = tSnap.docs.map(d => d.data());
+  if (courseId) tests = tests.filter(t => t.courseId === courseId);
+
+  // Load exam attempts
+  let aQ = query(collection(db,'examAttempts'), where('studentId','==',session.userId));
+  const aSnap = await getDocs(aQ);
+  let attempts = aSnap.docs.map(d => d.data());
+  if (courseId) attempts = attempts.filter(a => a.courseId === courseId);
+
+  const allResults = [
+    ...tests.map(t => ({type:t.type,subject:t.subject,courseName:t.courseName,marks:t.marks,total:t.total})),
+    ...attempts.map(a => ({type:'online',subject:a.examTitle||'MCQ',courseName:a.courseName||'-',marks:a.score,total:a.total}))
+  ];
+
+  const tbody = document.getElementById('resultsBody');
+  if (!allResults.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-600">No results yet</td></tr>'; return; }
+
+  let totalPct = 0;
+  tbody.innerHTML = allResults.map(r => {
+    const pct = r.total ? ((r.marks/r.total)*100).toFixed(1) : 0;
+    totalPct += parseFloat(pct);
+    const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B+':pct>=60?'B':pct>=50?'C':'F';
+    const tb = {daily:'bv2',monthly:'bi',final:'bo2',online:'bw2'}[r.type]||'bv2';
+    return `<tr><td><span class="badge ${tb}">${r.type}</span></td><td class="text-slate-300 text-xs">${r.subject||'-'}</td><td class="text-slate-500 text-xs">${r.courseName||'-'}</td><td class="text-violet-400 font-mono text-xs">${r.marks}/${r.total}</td><td><span class="badge ${pct>=75?'bg3':pct>=50?'bw2':'br2'}">${pct}%</span></td><td class="text-white font-bold text-xs">${grade}</td></tr>`;
+  }).join('');
+
+  const avgPct = (totalPct/allResults.length).toFixed(1);
+  const avgEl = document.getElementById('myAvgBadge');
+  avgEl.textContent = 'My Avg: ' + avgPct + '%'; avgEl.style.display = 'inline-flex';
+
+  // Results chart
+  if (chartMyResults) chartMyResults.destroy();
+  const ctx = document.getElementById('chartMyResults').getContext('2d');
+  const types = ['daily','monthly','final','online'];
+  const avgs = types.map(type => {
+    const items = allResults.filter(r => r.type===type);
+    return items.length ? parseFloat((items.reduce((s,r)=>s+(r.marks/r.total)*100,0)/items.length).toFixed(1)) : 0;
+  });
+  chartMyResults = new Chart(ctx, {type:'bar',data:{labels:['Daily','Monthly','Final','Online Exam'],datasets:[{label:'Avg %',data:avgs,backgroundColor:['rgba(167,139,250,0.6)','rgba(56,189,248,0.6)','rgba(251,113,133,0.6)','rgba(251,191,36,0.6)'],borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569'},grid:{display:false}},y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'},max:100}}}});
+
+  // Rank
+  if (courseId) await loadMyRank(courseId);
+
+  // Push to notify dashboard
+  renderPerfChart();
+};
+
+async function loadMyRank(courseId) {
+  const snap = await getDocs(query(collection(db,'examAttempts'), where('courseId','==',courseId)));
+  const all = snap.docs.map(d => d.data());
+  const byStudent = {};
+  all.forEach(a => { if (!byStudent[a.studentId] || a.score > byStudent[a.studentId].score) byStudent[a.studentId] = a; });
+  const sorted = Object.values(byStudent).sort((a,b) => (b.score/b.total)-(a.score/a.total));
+  const myIdx = sorted.findIndex(a => a.studentId === session.userId);
+  const rankCard = document.getElementById('rankCard');
+  if (myIdx >= 0) {
+    const myA = sorted[myIdx];
+    const pct = myA.total ? ((myA.score/myA.total)*100).toFixed(1) : 0;
+    document.getElementById('myRankNum').textContent = '#' + (myIdx+1);
+    document.getElementById('myRankName').textContent = session.name;
+    document.getElementById('myRankCourse').textContent = myA.courseName || '';
+    document.getElementById('myRankScore').textContent = myA.score + '/' + myA.total + ' (' + pct + '%)';
+    rankCard.classList.remove('hidden');
+  } else rankCard.classList.add('hidden');
+}
+
+// ── ONLINE EXAMS ──────────────────────────────────────────────
+async function loadExams() {
+  document.getElementById('examListView').style.display = 'block';
+  document.getElementById('examInterface').style.display = 'none';
+  document.getElementById('examResultView').style.display = 'none';
+  activeExam = null;
+
+  const snap = await getDocs(query(collection(db,'onlineExams'), where('isActive','==',true)));
+  const exams = snap.docs.map(d => ({id:d.id,...d.data()})).filter(ex => myEnrollments.find(e => e.courseId === ex.courseId));
+  const container = document.getElementById('examCards');
+  if (!exams.length) { container.innerHTML = '<div class="gc p-8 text-center text-slate-600">No active exams available for your courses.</div>'; return; }
+
+  const rows = await Promise.all(exams.map(async ex => {
+    // Check if already attempted
+    const attSnap = await getDocs(query(collection(db,'examAttempts'), where('examId','==',ex.id), where('studentId','==',session.userId)));
+    const attempted = !attSnap.empty;
+    let prevScore = null;
+    if (attempted) { const d = attSnap.docs[0].data(); prevScore = d.score + '/' + d.total + ' (' + ((d.score/d.total)*100).toFixed(1) + '%)'; }
+    return `<div class="gc p-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h4 class="font-bold text-white">${ex.title}</h4>
+          <p class="text-slate-500 text-xs mt-1">${ex.courseName||''} • ${ex.duration||0} min • ${ex.questions?.length||0} questions</p>
+          ${ex.startTime ? `<p class="text-slate-600 text-xs mt-0.5">Window: ${new Date(ex.startTime).toLocaleString('en-IN')} – ${new Date(ex.endTime||ex.startTime).toLocaleString('en-IN')}</p>` : ''}
+        </div>
+        <div class="flex items-center gap-3">
+          ${attempted ? `<div class="text-right"><span class="badge bg3">Attempted</span><p class="text-green-400 text-xs mt-1">${prevScore}</p></div>` : `<button onclick="startExam('${ex.id}')" class="btn bp whitespace-nowrap">Start Exam →</button>`}
+        </div>
+      </div>
+    </div>`;
+  }));
+  container.innerHTML = rows.join('');
+}
+
+window.startExam = async (examId) => {
+  const examDoc = await getDoc(doc(db,'onlineExams',examId));
+  if (!examDoc.exists()) return toast('Exam not found','error');
+  const exam = {id:examId,...examDoc.data()};
+  if (!exam.questions?.length) return toast('No questions in this exam yet','error');
+
+  activeExam = exam;
+  examAnswers = {};
+  currentQIdx = 0;
+  tabSwitchCount = 0;
+
+  document.getElementById('examListView').style.display = 'none';
+  document.getElementById('examResultView').style.display = 'none';
+  document.getElementById('examInterface').style.display = 'block';
+  document.getElementById('examIntTitle').textContent = exam.title;
+  document.getElementById('examIntMeta').textContent = (exam.courseName||'') + ' • ' + exam.questions.length + ' questions';
+
+  buildPalette();
+  showQuestion(0);
+  startTimer(exam.duration * 60);
+
+  // Tab switch detection
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+};
+
+function buildPalette() {
+  const palette = document.getElementById('qPalette');
+  palette.innerHTML = activeExam.questions.map((_,i) => `<div id="qd-${i}" class="q-dot" onclick="showQuestion(${i})">${i+1}</div>`).join('');
+}
+
+function showQuestion(idx) {
+  currentQIdx = idx;
+  const q = activeExam.questions[idx];
+  const total = activeExam.questions.length;
+  document.getElementById('qCounter').textContent = 'Q ' + (idx+1) + ' / ' + total;
+  document.getElementById('examProgress').style.width = ((idx+1)/total*100) + '%';
+
+  const selected = examAnswers[idx];
+  document.getElementById('questionArea').innerHTML = `
+    <div class="mb-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="badge bv2 text-xs">Q${idx+1}</span>
+        <span class="text-slate-500 text-xs">${q.marks} mark${q.marks>1?'s':''}</span>
+      </div>
+      <p class="text-white text-base font-medium leading-relaxed">${q.text}</p>
+    </div>
+    <div class="space-y-2.5">
+      ${['A','B','C','D'].map(opt => `
+        <button onclick="selectAnswer(${idx},'${opt}')" class="opt-btn ${selected===opt?'selected':''}" id="opt-${opt}">
+          <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${selected===opt?'bg-violet-500 text-white':'bg-slate-800 text-slate-400'}">${opt}</span>
+          <span>${q.options[opt]}</span>
+        </button>
+      `).join('')}
+    </div>`;
+
+  // Update palette
+  document.querySelectorAll('.q-dot').forEach((d,i) => {
+    d.className = 'q-dot' + (i===idx?' current':examAnswers[i]!==undefined?' answered':'');
+  });
+}
+
+window.selectAnswer = (qIdx, opt) => {
+  examAnswers[qIdx] = opt;
+  showQuestion(qIdx);
+};
+
+window.nextQ = () => { if (currentQIdx < activeExam.questions.length-1) showQuestion(currentQIdx+1); };
+window.prevQ = () => { if (currentQIdx > 0) showQuestion(currentQIdx-1); };
+
+function startTimer(seconds) {
+  let remaining = seconds;
+  clearInterval(examTimer);
+  examTimer = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining/60).toString().padStart(2,'0');
+    const s = (remaining%60).toString().padStart(2,'0');
+    const el = document.getElementById('timerDisplay');
+    if (el) { el.textContent = m + ':' + s; el.className = 'timer-box' + (remaining<=120?' timer-warn':''); }
+    if (remaining <= 0) { clearInterval(examTimer); submitExam(true); }
+  }, 1000);
+}
+
+function handleVisibilityChange() {
+  if (document.hidden && activeExam) {
+    tabSwitchCount++;
+    toast('Warning: Tab switch detected! (' + tabSwitchCount + '/3)','error');
+    if (tabSwitchCount >= 3) {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      submitExam(true);
+      toast('Exam auto-submitted due to tab switching!','error');
+    }
+  }
+}
+
+window.confirmSubmitExam = () => {
+  const answered = Object.keys(examAnswers).length;
+  const total = activeExam.questions.length;
+  if (!confirm(`You've answered ${answered}/${total} questions. Submit exam?`)) return;
+  submitExam(false);
+};
+
+async function submitExam(auto) {
+  if (!activeExam) return;
+  clearInterval(examTimer);
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+  let score = 0, maxScore = 0;
+  activeExam.questions.forEach((q,i) => {
+    maxScore += (q.marks||1);
+    if (examAnswers[i] === q.correct) score += (q.marks||1);
+  });
+
+  // Save attempt
+  const enrollment = myEnrollments.find(e => e.courseId === activeExam.courseId);
+  await addDoc(collection(db,'examAttempts'), {
+    examId:activeExam.id, examTitle:activeExam.title,
+    courseId:activeExam.courseId, courseName:activeExam.courseName||'',
+    studentId:session.userId, studentName:session.name,
+    score, total:maxScore, answers:examAnswers,
+    tabSwitches:tabSwitchCount, autoSubmit:auto,
+    submittedAt:serverTimestamp()
+  });
+
+  const pct = maxScore ? ((score/maxScore)*100).toFixed(1) : 0;
+  const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B+':pct>=60?'B':pct>=50?'C':'F';
+
+  document.getElementById('examInterface').style.display = 'none';
+  document.getElementById('examResultView').style.display = 'block';
+  document.getElementById('resultEmoji').textContent = pct>=75?'🎉':pct>=50?'👍':'😅';
+  document.getElementById('resultTitle').textContent = auto ? 'Exam Auto-Submitted' : 'Exam Completed!';
+  document.getElementById('resultSubtitle').textContent = 'Your score has been saved.';
+  document.getElementById('resultScore').textContent = score + '/' + maxScore;
+  document.getElementById('resultPct').textContent = pct + '%';
+  document.getElementById('resultGrade').textContent = grade;
+
+  activeExam = null;
+}
+
+window.backToExamList = () => {
+  document.getElementById('examResultView').style.display = 'none';
+  loadExams();
+};
+
+// ── DOWNLOADS ─────────────────────────────────────────────────
+let currentCertData = null; // stores the fetched cert for download
+
+function populateDownloadSelects() {
+  const opts = myCourseDocs.map(c=>`<option value="${c.id}" data-name="${c.name}">${c.name}</option>`).join('');
+  document.getElementById('certCourse').innerHTML = '<option value="">Select Course</option>' + opts;
+  document.getElementById('reportCourse').innerHTML = '<option value="">Select Course</option>' + opts;
+  // Reset cert status
+  document.getElementById('certStatusBox').classList.add('hidden');
+  document.getElementById('certDownloadBtn').classList.add('hidden');
+  currentCertData = null;
+  // Load all my certs
+  loadMyCertsList();
+}
+
+async function loadMyCertsList() {
+  const el = document.getElementById('myCertsList');
+  const snap = await getDocs(query(collection(db,'certificates'), where('studentId','==',session.userId)));
+  const certs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+    const da = a.issuedAt?.toDate?a.issuedAt.toDate():new Date(0);
+    const db2 = b.issuedAt?.toDate?b.issuedAt.toDate():new Date(0);
+    return db2-da;
+  });
+  if (!certs.length) {
+    el.innerHTML = '<div class="text-slate-600 text-sm text-center py-6 col-span-full">No certificates issued yet. Complete a course to earn one!</div>';
+    return;
+  }
+  el.innerHTML = certs.map(c=>`
+    <div class="p-4 rounded-xl border border-green-400/25 bg-green-400/5 hover:border-green-400/40 transition-all">
+      <div class="flex items-start gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl bg-green-400/15 border border-green-400/20 flex items-center justify-center text-xl flex-shrink-0">🎓</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-white font-bold text-sm truncate">${c.courseName}</p>
+          <p class="text-slate-500 text-xs mt-0.5">Completed: ${c.completionDate}</p>
+          ${c.remarks?`<p class="text-slate-600 text-xs italic">"${c.remarks}"</p>`:''}
+          <p class="text-slate-700 text-xs font-mono mt-0.5">${c.certNumber||''}</p>
+        </div>
+      </div>
+      <button onclick="downloadCertById('${c.id}')" class="btn bg2 w-full justify-center text-xs">⬇ Download PDF</button>
+    </div>`).join('');
+}
+
+window.checkCertStatus = async () => {
+  const sel = document.getElementById('certCourse');
+  const courseId = sel.value;
+  const statusBox = document.getElementById('certStatusBox');
+  const dlBtn = document.getElementById('certDownloadBtn');
+  currentCertData = null;
+  statusBox.classList.add('hidden');
+  dlBtn.classList.add('hidden');
+  if (!courseId) return;
+
+  // Check if cert exists in Firestore
+  const snap = await getDocs(query(collection(db,'certificates'),
+    where('studentId','==',session.userId), where('courseId','==',courseId)));
+
+  if (!snap.empty) {
+    const cert = {id:snap.docs[0].id,...snap.docs[0].data()};
+    currentCertData = cert;
+    statusBox.innerHTML = `
+      <div class="p-3 rounded-xl bg-green-400/8 border border-green-400/20 text-xs space-y-1">
+        <p class="text-green-400 font-bold">✅ Certificate issued!</p>
+        <p class="text-slate-400">Course: ${cert.courseName}</p>
+        <p class="text-slate-400">Completed: ${cert.completionDate}</p>
+        <p class="text-slate-500 font-mono">${cert.certNumber||''}</p>
+      </div>`;
+    statusBox.classList.remove('hidden');
+    dlBtn.classList.remove('hidden');
+  } else {
+    // Check attendance to give feedback
+    const attSnap = await getDocs(query(collection(db,'attendance'),
+      where('studentId','==',session.userId), where('courseId','==',courseId)));
+    const atts = attSnap.docs.map(d=>d.data());
+    const pct = atts.length?((atts.filter(a=>a.status==='present').length/atts.length)*100).toFixed(1):0;
+    statusBox.innerHTML = `
+      <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700 text-xs space-y-1.5">
+        <p class="text-slate-400 font-semibold">🔒 Certificate not issued yet</p>
+        <p class="text-slate-500">Your attendance: <span class="${pct>=75?'text-green-400':'text-red-400'} font-bold">${pct}%</span></p>
+        <p class="text-slate-600">Certificate is issued by your teacher after course completion. Contact your teacher.</p>
+      </div>`;
+    statusBox.classList.remove('hidden');
+  }
+};
+
+window.downloadCert = () => {
+  if (!currentCertData) return toast('Please select a course first','error');
+  generateStudentCertPDF(currentCertData);
+  toast('Certificate downloaded!','success');
+};
+
+window.downloadCertById = async (certId) => {
+  const snap = await getDocs(query(collection(db,'certificates'), where('studentId','==',session.userId)));
+  const cert = snap.docs.find(d=>d.id===certId)?.data();
+  if (!cert) return toast('Certificate not found','error');
+  generateStudentCertPDF(cert);
+  toast('Certificate downloaded!','success');
+};
+
+function generateStudentCertPDF(cert) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+  // Dark bg
+  pdf.setFillColor(7,5,15); pdf.rect(0,0,297,210,'F');
+  // Outer border violet
+  pdf.setDrawColor(130,90,220); pdf.setLineWidth(1.5); pdf.rect(8,8,281,194);
+  // Inner border rose
+  pdf.setDrawColor(251,113,133); pdf.setLineWidth(0.5); pdf.rect(12,12,273,186);
+  // Corner accents
+  pdf.setFillColor(167,139,250);
+  pdf.circle(12,12,4,'F'); pdf.circle(285,12,4,'F');
+  pdf.circle(12,198,4,'F'); pdf.circle(285,198,4,'F');
+  // Header
+  pdf.setTextColor(167,139,250); pdf.setFontSize(9); pdf.setFont('helvetica','bold');
+  pdf.text('VISION IT COMPUTER INSTITUTE', 148.5, 34, {align:'center'});
+  pdf.setDrawColor(167,139,250,0.5); pdf.line(75,38,222,38);
+  // Title
+  pdf.setFontSize(22); pdf.setTextColor(255,255,255);
+  pdf.text('CERTIFICATE OF COMPLETION', 148.5, 57, {align:'center'});
+  // Body
+  pdf.setFontSize(10); pdf.setTextColor(180,170,210); pdf.setFont('helvetica','normal');
+  pdf.text('This is to proudly certify that', 148.5, 74, {align:'center'});
+  // Student name
+  pdf.setFontSize(22); pdf.setTextColor(167,139,250); pdf.setFont('helvetica','bold');
+  pdf.text(cert.studentName, 148.5, 93, {align:'center'});
+  pdf.setDrawColor(167,139,250,0.4); pdf.line(85,97,212,97);
+  // Course
+  pdf.setFontSize(10); pdf.setTextColor(180,170,210); pdf.setFont('helvetica','normal');
+  pdf.text('has successfully completed the course', 148.5, 110, {align:'center'});
+  pdf.setFontSize(15); pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold');
+  pdf.text(cert.courseName, 148.5, 125, {align:'center'});
+  // Date
+  const dtStr = new Date(cert.completionDate).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  pdf.setFontSize(9.5); pdf.setTextColor(180,170,210); pdf.setFont('helvetica','normal');
+  pdf.text('Date of Completion: ' + dtStr, 148.5, 141, {align:'center'});
+  if (cert.remarks) {
+    pdf.setFontSize(8.5); pdf.setTextColor(100,90,140);
+    pdf.text('"' + cert.remarks + '"', 148.5, 152, {align:'center'});
+  }
+  // Signatures
+  pdf.setDrawColor(167,139,250); pdf.line(50,166,115,166);
+  pdf.setTextColor(180,170,210); pdf.setFontSize(9);
+  pdf.text('Director', 82.5, 172, {align:'center'});
+  pdf.line(183,166,247,166);
+  pdf.text('Principal', 215, 172, {align:'center'});
+  // Footer
+  pdf.setFontSize(7); pdf.setTextColor(60,50,90);
+  pdf.text('Student ID: ' + cert.studentId + ' · Cert No: ' + (cert.certNumber||'') + ' · visionitinstitute.com', 148.5, 190, {align:'center'});
+  pdf.save('certificate_' + cert.studentId + '_' + cert.courseId + '.pdf');
+}
+
+window.downloadIDCard = async () => {
+  const d = await getDoc(doc(db,'users',session.userId));
+  if (!d.exists()) return;
+  const user = d.data();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape',unit:'mm',format:[85,54]});
+  pdf.setFillColor(7,5,15); pdf.rect(0,0,85,54,'F');
+  pdf.setFillColor(50,20,80); pdf.rect(0,0,85,14,'F');
+  pdf.setTextColor(200,180,255); pdf.setFontSize(6.5); pdf.setFont('helvetica','bold');
+  pdf.text('VISION IT COMPUTER INSTITUTE',42.5,6,{align:'center'});
+  pdf.setFontSize(5); pdf.setTextColor(150,130,200);
+  pdf.text('STUDENT IDENTITY CARD',42.5,10,{align:'center'});
+  pdf.setDrawColor(130,90,220); pdf.setLineWidth(0.3); pdf.line(5,14,80,14);
+  pdf.setTextColor(255,255,255); pdf.setFontSize(8.5); pdf.setFont('helvetica','bold');
+  pdf.text(user.name,42.5,21,{align:'center'});
+  pdf.setFontSize(6); pdf.setTextColor(180,160,240); pdf.setFont('helvetica','normal');
+  pdf.text('ID: ' + user.userId,42.5,27,{align:'center'});
+  if (user.courseAssigned) pdf.text('Course: ' + user.courseAssigned,42.5,32,{align:'center'});
+  if (user.phone) pdf.text('Ph: ' + user.phone,42.5,37,{align:'center'});
+  if (user.guardianName) pdf.text('Guardian: ' + user.guardianName,42.5,42,{align:'center'});
+  pdf.setFontSize(4.5); pdf.setTextColor(100,80,150);
+  pdf.text('visionitinstitute.com',42.5,49,{align:'center'});
+  pdf.save('idcard_' + user.userId + '.pdf');
+  toast('ID Card downloaded!','success');
+};
+
+window.downloadReport = async () => {
+  const sel = document.getElementById('reportCourse');
+  const courseId = sel.value;
+  if (!courseId) return toast('Select a course','error');
+  const courseName = sel.options[sel.selectedIndex].dataset.name;
+  const d = await getDoc(doc(db,'users',session.userId));
+  const user = d.data();
+  const tSnap = await getDocs(query(collection(db,'tests'), where('studentId','==',session.userId), where('courseId','==',courseId)));
+  const tests = tSnap.docs.map(d => d.data());
+  const aSnap = await getDocs(query(collection(db,'examAttempts'), where('studentId','==',session.userId), where('courseId','==',courseId)));
+  const attempts = aSnap.docs.map(d => d.data());
+  const attSnap = await getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId), where('courseId','==',courseId)));
+  const attRecords = attSnap.docs.map(d => d.data());
+  const attPct = attRecords.length ? ((attRecords.filter(a=>a.status==='present').length/attRecords.length)*100).toFixed(1) : '0';
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  pdf.setFillColor(7,5,15); pdf.rect(0,0,210,297,'F');
+  pdf.setFillColor(30,15,60); pdf.rect(0,0,210,30,'F');
+  pdf.setTextColor(167,139,250); pdf.setFontSize(14); pdf.setFont('helvetica','bold');
+  pdf.text('Vision IT Computer Institute',105,12,{align:'center'});
+  pdf.setFontSize(9); pdf.setTextColor(180,160,240);
+  pdf.text('STUDENT REPORT CARD',105,22,{align:'center'});
+  pdf.setDrawColor(130,90,220); pdf.line(15,30,195,30);
+
+  let y = 42;
+  pdf.setFontSize(10); pdf.setTextColor(220,210,255);
+  pdf.text('Student: ' + user.name,15,y); pdf.text('ID: ' + user.userId,130,y); y+=8;
+  pdf.text('Course: ' + courseName,15,y); pdf.text('Date: ' + new Date().toLocaleDateString('en-IN'),130,y); y+=8;
+  pdf.text('Attendance: ' + attPct + '%',15,y); y+=10;
+  pdf.setDrawColor(80,50,150); pdf.line(15,y,195,y); y+=8;
+
+  const sections = [{label:'Daily Tests',items:tests.filter(t=>t.type==='daily')},{label:'Monthly Tests',items:tests.filter(t=>t.type==='monthly')},{label:'Final Exam',items:tests.filter(t=>t.type==='final')},{label:'Online Exams',items:attempts.map(a=>({subject:a.examTitle||'MCQ',marks:a.score,total:a.total}))}];
+  sections.forEach(sec => {
+    if (!sec.items.length) return;
+    pdf.setFontSize(9); pdf.setTextColor(167,139,250); pdf.setFont('helvetica','bold');
+    pdf.text(sec.label,15,y); y+=6;
+    sec.items.forEach(t => {
+      const pct = t.total ? ((t.marks/t.total)*100).toFixed(1) : 0;
+      const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B+':pct>=60?'B':pct>=50?'C':'F';
+      pdf.setFontSize(8); pdf.setTextColor(200,190,230); pdf.setFont('helvetica','normal');
+      pdf.text((t.subject||'Test').substring(0,30),20,y);
+      pdf.text(t.marks + '/' + t.total,140,y);
+      pdf.text(pct + '%',160,y);
+      pdf.text(grade,185,y);
+      y+=6;
+      if (y > 270) { pdf.addPage(); pdf.setFillColor(7,5,15); pdf.rect(0,0,210,297,'F'); y=20; }
+    });
+    y+=4;
+  });
+
+  pdf.setDrawColor(80,50,150); pdf.line(15,y,195,y);
+  pdf.save('report_' + user.userId + '_' + courseId + '.pdf');
+  toast('Report Card downloaded!','success');
+};
+
+// ── TODAY'S SCHEDULE (dashboard) ─────────────────────────────
+async function loadTodayScheduleDash() {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const today = days[new Date().getDay()];
+  try {
+    const courseIds = myEnrollments.map(e=>e.courseId);
+    if (!courseIds.length) { document.getElementById('todayClassesDash').innerHTML = '<p class="text-slate-600 text-xs text-center py-3">Enroll in a course first</p>'; return; }
+    const snap = await getDocs(query(collection(db,'schedule'), where('day','==',today)));
+    const slots = snap.docs.map(d=>d.data()).filter(s=>courseIds.includes(s.courseId)).sort((a,b)=>a.startTime.localeCompare(b.startTime));
+    const el = document.getElementById('todayClassesDash');
+    if (!slots.length) { el.innerHTML = '<p class="text-slate-600 text-xs text-center py-3">No classes today</p>'; return; }
+    el.innerHTML = slots.map(s=>`<div class="sched-slot"><p class="text-white text-xs font-semibold">${s.topic||'Class'}</p><p class="text-violet-400 text-xs">${s.startTime}–${s.endTime} · <span class="text-slate-500">${s.courseName||''}</span></p></div>`).join('');
+  } catch(e) {}
+}
+
+// ── PENDING HOMEWORK (dashboard) ─────────────────────────────
+async function loadPendingHwDash() {
+  try {
+    const courseIds = myEnrollments.map(e=>e.courseId);
+    if (!courseIds.length) return;
+    const today = new Date().toISOString().split('T')[0];
+    const snap = await getDocs(query(collection(db,'homeworks'), where('isActive','==',true)));
+    const hws = snap.docs.map(d=>({id:d.id,...d.data()})).filter(h=>courseIds.includes(h.courseId));
+    // Check submissions
+    const subSnap = await getDocs(query(collection(db,'hwSubmissions'), where('studentId','==',session.userId)));
+    const submittedIds = new Set(subSnap.docs.map(d=>d.data().hwId));
+    const pending = hws.filter(h=>!submittedIds.has(h.id));
+    document.getElementById('dHomework').textContent = pending.length;
+    const badge = document.getElementById('hwPendingBadge');
+    if (badge) { badge.textContent = pending.length; badge.classList.toggle('hidden', pending.length===0); }
+    const el = document.getElementById('pendingHwDash');
+    if (!pending.length) { el.innerHTML = '<p class="text-slate-600 text-xs text-center py-3">🎉 All homework done!</p>'; return; }
+    el.innerHTML = pending.slice(0,4).map(h=>`
+      <div class="flex items-center justify-between p-2.5 rounded-lg bg-violet-400/5 border border-violet-400/10 cursor-pointer hover:border-violet-400/25 transition-all" onclick="showSec('homework')">
+        <div class="flex-1 min-w-0">
+          <p class="text-white text-xs font-semibold truncate">${h.title}</p>
+          <p class="text-slate-600 text-xs">${h.courseName} · ${h.questions?.length||0} Qs</p>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          ${h.dueDate&&h.dueDate<today?'<span class="badge br2 text-xs">Overdue</span>':'<span class="badge bw2 text-xs">Pending</span>'}
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ── TOPIC-WISE CLASSES (student) ──────────────────────────────
+function populateStudentTopicFilter() {
+  document.getElementById('topicCourseFilter').innerHTML = '<option value="">Select Course</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+window.loadStudentTopics = async () => {
+  const courseId = document.getElementById('topicCourseFilter').value;
+  const el = document.getElementById('studentTopicsList');
+  if (!courseId) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">Select a course</div>'; return; }
+  const snap = await getDocs(query(collection(db,'topics'), where('courseId','==',courseId)));
+  const topics = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+  if (!topics.length) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">No topics added yet by your teacher</div>'; return; }
+  const total = topics.length;
+  const done = topics.filter(t=>t.status==='completed').length;
+  const progressPct = total ? ((done/total)*100).toFixed(0) : 0;
+  el.innerHTML = `<div class="gc p-4 mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-white text-sm font-semibold">Course Progress</p>
+      <span class="text-violet-400 font-bold">${done}/${total} completed</span>
+    </div>
+    <div class="pbar"><div class="pfill" style="width:${progressPct}%"></div></div>
+  </div>` +
+  topics.map((t,i) => `
+    <div class="topic-card">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${t.status==='completed'?'bg-green-400/20 text-green-400 border border-green-400/25':t.status==='ongoing'?'bg-yellow-400/20 text-yellow-400 border border-yellow-400/25':'bg-violet-400/15 text-violet-400 border border-violet-400/20'}">${t.status==='completed'?'✓':t.order||i+1}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <p class="text-white font-semibold text-sm">${t.title}</p>
+            <span class="badge ${t.status==='completed'?'bg3':t.status==='ongoing'?'bw2':'bv2'} text-xs">${t.status||'pending'}</span>
+          </div>
+          <p class="text-slate-500 text-xs">${t.description||''}</p>
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            ${t.duration?`<span class="badge bi text-xs">⏱ ${t.duration} min</span>`:''}
+            ${t.date?`<span class="badge bv2 text-xs">📅 ${t.date}</span>`:''}
+          </div>
+          ${t.objectives?`<p class="text-slate-600 text-xs mt-1.5">🎯 ${t.objectives}</p>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+};
+
+// ── CLASS SCHEDULE (student) ───────────────────────────────────
+function populateStudentSchedFilter() {
+  document.getElementById('schedCourseFilter').innerHTML = '<option value="">Select Course</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+window.loadStudentSchedule = async () => {
+  const courseId = document.getElementById('schedCourseFilter').value;
+  if (!courseId) return;
+  const snap = await getDocs(query(collection(db,'schedule'), where('courseId','==',courseId)));
+  const slots = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const weekEl = document.getElementById('weeklySchedStudent');
+  const byDay = {};
+  slots.forEach(s => { if (!byDay[s.day]) byDay[s.day]=[]; byDay[s.day].push(s); });
+  weekEl.innerHTML = days.map(d => {
+    const ds = byDay[d]||[];
+    return `<div class="mb-1"><p class="text-slate-600 text-xs font-bold uppercase mb-1">${d.slice(0,3)}</p>
+    ${ds.length ? ds.map(s=>`<div class="sched-slot"><p class="text-white text-xs font-semibold">${s.topic||'Class'}</p><p class="text-violet-400 text-xs">${s.startTime}–${s.endTime}</p></div>`).join('') : '<div class="pl-3 text-slate-700 text-xs mb-1">–</div>'}</div>`;
+  }).join('');
+  const listEl = document.getElementById('scheduleListStudent');
+  if (!slots.length) { listEl.innerHTML = '<div class="text-slate-600 text-xs text-center py-6">No schedule added yet</div>'; return; }
+  const sorted = slots.sort((a,b) => {
+    const dayOrder = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    return dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day)||a.startTime.localeCompare(b.startTime);
+  });
+  listEl.innerHTML = sorted.map(s=>`
+    <div class="p-3 rounded-xl border border-violet-400/12 bg-violet-400/4">
+      <div class="flex items-center gap-2 flex-wrap mb-0.5">
+        <span class="badge bv2 text-xs">${s.day}</span>
+        <span class="text-white text-xs font-semibold">${s.topic||'Class'}</span>
+        ${s.type?`<span class="badge bi text-xs">${s.type}</span>`:''}
+      </div>
+      <p class="text-slate-500 text-xs">${s.startTime}–${s.endTime} · ${s.room||'Online'}</p>
+      ${s.notes?`<p class="text-slate-600 text-xs italic">${s.notes}</p>`:''}
+    </div>`).join('');
+};
+
+// ── CLASS MATERIALS (student) ─────────────────────────────────
+async function populateStudentMatFilters() {
+  document.getElementById('matCourseFilter').innerHTML = '<option value="">Select Course</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('matTopicFilter').innerHTML = '<option value="">All Topics</option>';
+}
+
+window.loadStudentMaterials = async () => {
+  const courseId = document.getElementById('matCourseFilter').value;
+  const topicFilter = document.getElementById('matTopicFilter').value;
+  const el = document.getElementById('studentMaterialsList');
+  if (!courseId) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600 col-span-full">Select a course</div>'; return; }
+  const tSnap = await getDocs(query(collection(db,'topics'), where('courseId','==',courseId)));
+  const topics = tSnap.docs.map(d=>d.data());
+  document.getElementById('matTopicFilter').innerHTML = '<option value="">All Topics</option>' + topics.map(t=>`<option value="${t.title}">${t.title}</option>`).join('');
+  const snap = topicFilter ?
+    await getDocs(query(collection(db,'materials'), where('courseId','==',courseId), where('topic','==',topicFilter))) :
+    await getDocs(query(collection(db,'materials'), where('courseId','==',courseId)));
+  const mats = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+    const da = a.createdAt?.toDate?a.createdAt.toDate():new Date(0);
+    const db2 = b.createdAt?.toDate?b.createdAt.toDate():new Date(0);
+    return db2-da;
+  });
+  if (!mats.length) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600 col-span-full">No materials uploaded yet</div>'; return; }
+  const typeIcon = {pdf:'📄',video:'🎬',image:'🖼',link:'🔗',doc:'📝',other:'📎'};
+  el.innerHTML = mats.map(m=>`
+    <div class="mat-card">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-violet-400/10 border border-violet-400/15">${typeIcon[m.type]||'📎'}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-white text-sm font-semibold truncate">${m.title}</p>
+        <p class="text-slate-500 text-xs">${m.topic||'General'} · <span class="badge bv2 text-xs">${m.type||'file'}</span></p>
+        ${m.description?`<p class="text-slate-600 text-xs italic">${m.description}</p>`:''}
+      </div>
+      ${m.url?`<a href="${m.url}" target="_blank" class="btn bv text-xs flex-shrink-0">Open →</a>`:''}
+    </div>`).join('');
+};
+
+// ── DAILY HOMEWORK (student) ──────────────────────────────────
+function populateStudentHwFilters() {
+  document.getElementById('hwCourseFilter').innerHTML = '<option value="">Select Course</option>' + myCourseDocs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function listenHomeworkUpdates() {
+  if (!session) return;
+  const courseIds = myEnrollments.map(e=>e.courseId);
+  if (!courseIds.length) return;
+  hwUnsub = onSnapshot(query(collection(db,'homeworks'), where('isActive','==',true)), (snap) => {
+    const hws = snap.docs.map(d=>({id:d.id,...d.data()})).filter(h=>courseIds.includes(h.courseId));
+    getDocs(query(collection(db,'hwSubmissions'), where('studentId','==',session.userId))).then(subSnap => {
+      const submittedIds = new Set(subSnap.docs.map(d=>d.data().hwId));
+      const pending = hws.filter(h=>!submittedIds.has(h.id)).length;
+      document.getElementById('dHomework').textContent = pending;
+      const badge = document.getElementById('hwPendingBadge');
+      if (badge) { badge.textContent = pending; badge.classList.toggle('hidden', pending===0); }
+    });
+  });
+}
+
+window.loadStudentHomework = async () => {
+  const courseId = document.getElementById('hwCourseFilter').value;
+  const dateFilter = document.getElementById('hwDateFilter').value;
+  const statusFilter = document.getElementById('hwStatusFilter').value;
+  const el = document.getElementById('studentHwList');
+  if (!courseId) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">Select a course to view homework</div>'; return; }
+  const snap = await getDocs(query(collection(db,'homeworks'), where('courseId','==',courseId), where('isActive','==',true)));
+  let hws = snap.docs.map(d=>({id:d.id,...d.data()}));
+  if (dateFilter) hws = hws.filter(h=>h.date===dateFilter);
+  hws.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  // Get submissions
+  const subSnap = await getDocs(query(collection(db,'hwSubmissions'), where('studentId','==',session.userId), where('courseId','==',courseId)));
+  const subMap = {};
+  subSnap.docs.forEach(d=>{ const dat=d.data(); subMap[dat.hwId]=dat; });
+  // Filter by status
+  if (statusFilter === 'pending') hws = hws.filter(h=>!subMap[h.id]);
+  if (statusFilter === 'done') hws = hws.filter(h=>!!subMap[h.id]);
+  if (!hws.length) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">No homework found</div>'; return; }
+  el.innerHTML = hws.map(hw => {
+    const sub = subMap[hw.id];
+    const today = new Date().toISOString().split('T')[0];
+    const isOverdue = hw.dueDate && hw.dueDate < today && !sub;
+    return `<div class="hw-card">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <p class="text-white font-bold text-sm">${hw.title}</p>
+            <span class="badge bv2">${hw.questions?.length||0} Qs</span>
+            <span class="badge bi">${hw.date}</span>
+            ${hw.dueDate?`<span class="badge ${isOverdue?'br2':'bw2'}">Due: ${hw.dueDate}</span>`:''}
+          </div>
+          <p class="text-slate-500 text-xs">${hw.courseName}${hw.topic?` · 📌 ${hw.topic}`:''}</p>
+          ${hw.instructions?`<p class="text-slate-600 text-xs mt-1 italic">${hw.instructions}</p>`:''}
+        </div>
+        <div class="flex-shrink-0">
+          ${sub ?
+            `<div class="text-right"><span class="badge bg3 text-xs">✓ Submitted</span><p class="text-green-400 font-bold text-sm mt-1">${sub.score}/${sub.total} (${sub.total?((sub.score/sub.total)*100).toFixed(0):'0'}%)</p></div>` :
+            `<button onclick="openHomework('${hw.id}')" class="btn bp text-xs">Start →</button>`}
+        </div>
+      </div>
+      ${sub ? `<div class="pbar"><div class="pfill" style="width:${sub.total?((sub.score/sub.total)*100).toFixed(0):0}%"></div></div>` : ''}
+    </div>`;
+  }).join('');
+};
+
+window.openHomework = async (hwId) => {
+  const d = await getDoc(doc(db,'homeworks',hwId));
+  if (!d.exists()) return toast('Homework not found','error');
+  const hw = {id:hwId,...d.data()};
+  if (!hw.questions?.length) return toast('No questions in this homework','error');
+  // Check already submitted
+  const subSnap = await getDocs(query(collection(db,'hwSubmissions'), where('hwId','==',hwId), where('studentId','==',session.userId)));
+  if (!subSnap.empty) return toast('Already submitted this homework','error');
+  activeHw = hw;
+  hwAnswers = {};
+  showModal(buildHwModal(hw, 0));
+};
+
+function buildHwModal(hw, qIdx) {
+  const q = hw.questions[qIdx];
+  const total = hw.questions.length;
+  const answered = Object.keys(hwAnswers).length;
+  const selected = hwAnswers[qIdx];
+  return `<div class="flex items-center justify-between mb-4">
+    <h3 class="text-base font-bold text-white">${hw.title}</h3>
+    <span class="badge bv2">Q${qIdx+1}/${total}</span>
+  </div>
+  <div class="pbar mb-4"><div class="pfill" style="width:${((answered/total)*100).toFixed(0)}%"></div></div>
+  <div class="mb-4">
+    <p class="text-white text-sm font-medium leading-relaxed mb-1">${q.text}</p>
+    <p class="text-slate-600 text-xs">${q.marks} mark${q.marks>1?'s':''}</p>
+  </div>
+  <div class="space-y-2.5 mb-5">
+    ${['A','B','C','D'].filter(opt=>q.options[opt]).map(opt=>`
+      <button onclick="selectHwAnswer(${qIdx},'${opt}')" class="hw-option ${selected===opt?'selected':''}" id="hwopt-${opt}">
+        <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${selected===opt?'bg-violet-500 text-white':'bg-slate-800 text-slate-400'}">${opt}</span>
+        <span>${q.options[opt]}</span>
+      </button>`).join('')}
+  </div>
+  <div class="flex gap-2">
+    ${qIdx>0?`<button onclick="hwNav(${qIdx-1})" class="btn bv flex-1 justify-center">← Prev</button>`:'<div class="flex-1"></div>'}
+    ${qIdx<total-1?
+      `<button onclick="hwNav(${qIdx+1})" class="btn bp flex-1 justify-center">Next →</button>` :
+      `<button onclick="submitHomework()" class="btn bg2 flex-1 justify-center">Submit Homework ✓</button>`}
+  </div>
+  <div class="mt-3 flex flex-wrap gap-1.5">
+    ${hw.questions.map((_,i)=>`<div onclick="hwNav(${i})" class="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold cursor-pointer border transition-all ${i===qIdx?'bg-violet-500 text-white border-violet-500':hwAnswers[i]!==undefined?'bg-violet-400/20 text-violet-400 border-violet-400/35':'bg-slate-800/80 text-slate-500 border-slate-700'}">${i+1}</div>`).join('')}
+  </div>`;
+}
+
+window.selectHwAnswer = (qIdx, opt) => {
+  hwAnswers[qIdx] = opt;
+  if (activeHw) showModal(buildHwModal(activeHw, qIdx));
+};
+
+window.hwNav = (qIdx) => {
+  if (activeHw) showModal(buildHwModal(activeHw, qIdx));
+};
+
+window.submitHomework = async () => {
+  if (!activeHw) return;
+  const answered = Object.keys(hwAnswers).length;
+  const total = activeHw.questions.length;
+  if (answered < total) {
+    if (!confirm(`You have answered ${answered}/${total} questions. Submit anyway?`)) return;
+  }
+  let score = 0, maxScore = 0;
+  activeHw.questions.forEach((q,i) => {
+    maxScore += (q.marks||1);
+    if (hwAnswers[i] === q.correct) score += (q.marks||1);
+  });
+  const enrollment = myEnrollments.find(e=>e.courseId===activeHw.courseId);
+  await addDoc(collection(db,'hwSubmissions'), {
+    hwId:activeHw.id, hwTitle:activeHw.title,
+    courseId:activeHw.courseId, courseName:activeHw.courseName||'',
+    teacherId:activeHw.teacherId||'',
+    studentId:session.userId, studentName:session.name,
+    score, total:maxScore, answers:hwAnswers,
+    submittedAt:serverTimestamp()
+  });
+  const pct = maxScore?((score/maxScore)*100).toFixed(0):0;
+  const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B+':pct>=60?'B':pct>=50?'C':'F';
+  closeModal();
+  // Show result popup
+  showModal(`<div class="text-center py-4">
+    <div class="text-5xl mb-3">${pct>=75?'🎉':pct>=50?'👍':'😅'}</div>
+    <h3 class="text-xl font-bold text-white mb-1">Homework Submitted!</h3>
+    <p class="text-slate-400 text-sm mb-5">${activeHw.title}</p>
+    <div class="grid grid-cols-3 gap-3 mb-5">
+      <div class="p-3 rounded-xl bg-violet-400/8 border border-violet-400/15 text-center">
+        <div class="text-violet-400 font-bold text-lg">${score}/${maxScore}</div>
+        <div class="text-slate-600 text-xs">Score</div>
+      </div>
+      <div class="p-3 rounded-xl bg-green-400/8 border border-green-400/15 text-center">
+        <div class="text-green-400 font-bold text-lg">${pct}%</div>
+        <div class="text-slate-600 text-xs">Percentage</div>
+      </div>
+      <div class="p-3 rounded-xl bg-yellow-400/8 border border-yellow-400/15 text-center">
+        <div class="text-yellow-400 font-bold text-lg">${grade}</div>
+        <div class="text-slate-600 text-xs">Grade</div>
+      </div>
+    </div>
+    <button onclick="closeModal();loadStudentHomework();" class="btn bp w-full justify-center">Done</button>
+  </div>`);
+  activeHw = null; hwAnswers = {};
+  loadPendingHwDash();
+};
+
+// ── MY BATCHES (student) ─────────────────────────────────────
+let currentStudentBatchId = null;
+
+window.loadStudentBatches = async () => {
+  const el = document.getElementById('studentBatchesList');
+  el.innerHTML = '<div class="gc p-6 text-center text-slate-500 col-span-full text-sm">Loading...</div>';
+  document.getElementById('studentBatchDetail').classList.add('hidden');
+  el.classList.remove('hidden');
+  // Find batches where this student is enrolled
+  const snap = await getDocs(query(collection(db,'batchEnrollments'), where('studentId','==',session.userId)));
+  const batchIds = [...new Set(snap.docs.map(d=>d.data().batchId))];
+  if (!batchIds.length) {
+    el.innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full">You have not been added to any batch yet. Contact your teacher.</div>';
+    return;
+  }
+  const batches = [];
+  for (const bId of batchIds) {
+    try {
+      const bd = await getDoc(doc(db,'batches',bId));
+      if (bd.exists()) batches.push({id:bd.id,...bd.data()});
+    } catch(e) {}
+  }
+  if (!batches.length) { el.innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full">No batch details found.</div>'; return; }
+  el.innerHTML = batches.map(b=>`
+    <div class="gc p-5 hover:border-violet-400/25 transition-all cursor-pointer" onclick="openStudentBatchDetail('${b.id}')">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <h4 class="text-white font-bold text-sm">${b.name}</h4>
+            <span class="badge ${b.status==='active'?'bg3':b.status==='completed'?'bv2':'bw2'}">${b.status||'active'}</span>
+          </div>
+          <p class="text-slate-500 text-xs">${b.courseName||''}</p>
+        </div>
+        <div class="text-violet-400 text-lg">👥</div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <div class="p-2 rounded-lg bg-violet-400/5 border border-violet-400/10 text-center">
+          <div class="text-violet-400 font-bold">${b.studentCount||0}</div>
+          <div class="text-slate-600 text-xs">Students</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-400/5 border border-rose-400/10 text-center">
+          <div class="text-rose-400 font-bold text-xs">${b.timing||'–'}</div>
+          <div class="text-slate-600 text-xs">Timing</div>
+        </div>
+      </div>
+      <div class="text-xs text-slate-500 flex flex-wrap gap-2">
+        ${b.startDate?`<span>📅 ${b.startDate}</span>`:''}
+        ${b.schedule?`<span>📆 ${b.schedule}</span>`:''}
+        ${b.room?`<span>🏛 ${b.room}</span>`:''}
+      </div>
+    </div>`).join('');
+};
+
+window.openStudentBatchDetail = async (bId) => {
+  currentStudentBatchId = bId;
+  const bd = await getDoc(doc(db,'batches',bId));
+  const b = bd.data();
+  document.getElementById('stdBatchName').textContent = b.name;
+  document.getElementById('stdBatchMeta').textContent = (b.courseName||'') + ' · ' + (b.status||'active') + (b.timing?' · '+b.timing:'');
+  document.getElementById('studentBatchesList').classList.add('hidden');
+  document.getElementById('studentBatchDetail').classList.remove('hidden');
+  showStudentBatchTab('info');
+  // Load info tab
+  document.getElementById('studentBatchTab-info').innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="space-y-3">
+        ${b.startDate?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Start Date</span><span class="text-white text-xs font-semibold">${b.startDate}</span></div>`:''}
+        ${b.endDate?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">End Date</span><span class="text-white text-xs font-semibold">${b.endDate}</span></div>`:''}
+        ${b.timing?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Timing</span><span class="text-white text-xs font-semibold">${b.timing}</span></div>`:''}
+        ${b.schedule?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Schedule</span><span class="text-white text-xs font-semibold">${b.schedule}</span></div>`:''}
+        ${b.room?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Room/Platform</span><span class="text-white text-xs font-semibold">${b.room}</span></div>`:''}
+        ${b.teacherName?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Teacher</span><span class="text-violet-400 text-xs font-semibold">${b.teacherName}</span></div>`:''}
+      </div>
+      ${b.description?`<div class="gc p-4"><h4 class="text-sm font-semibold text-white mb-2">Notes</h4><p class="text-slate-400 text-xs leading-relaxed">${b.description}</p></div>`:''}
+    </div>`;
+};
+
+window.closeStudentBatchDetail = () => {
+  currentStudentBatchId = null;
+  document.getElementById('studentBatchDetail').classList.add('hidden');
+  document.getElementById('studentBatchesList').classList.remove('hidden');
+  loadStudentBatches();
+};
+
+window.showStudentBatchTab = async (tab) => {
+  ['info','attendance','classmates'].forEach(t => {
+    document.getElementById('studentBatchTab-' + t).classList.toggle('hidden', t !== tab);
+    document.getElementById('sbtab-' + t).className = t === tab ? 'btn bp text-xs' : 'btn bv text-xs';
+  });
+  if (tab === 'attendance') await loadMyBatchAttendance();
+  if (tab === 'classmates') await loadBatchClassmates();
+};
+
+async function loadMyBatchAttendance() {
+  const el = document.getElementById('studentBatchTab-attendance');
+  const snap = await getDocs(query(collection(db,'batchAttendance'), where('batchId','==',currentStudentBatchId), where('studentId','==',session.userId)));
+  const records = snap.docs.map(d=>d.data()).sort((a,b)=>b.date.localeCompare(a.date));
+  const total = records.length;
+  const present = records.filter(r=>r.status==='present').length;
+  const late = records.filter(r=>r.status==='late').length;
+  const absent = records.filter(r=>r.status==='absent').length;
+  const pct = total ? (((present+late)/total)*100).toFixed(1) : 0;
+  el.innerHTML = `
+    <div class="grid grid-cols-4 gap-3 mb-4">
+      <div class="p-3 rounded-xl bg-violet-400/8 border border-violet-400/15 text-center"><div class="text-violet-400 font-bold text-lg">${total}</div><div class="text-slate-600 text-xs">Total</div></div>
+      <div class="p-3 rounded-xl bg-green-400/8 border border-green-400/15 text-center"><div class="text-green-400 font-bold text-lg">${present}</div><div class="text-slate-600 text-xs">Present</div></div>
+      <div class="p-3 rounded-xl bg-yellow-400/8 border border-yellow-400/15 text-center"><div class="text-yellow-400 font-bold text-lg">${late}</div><div class="text-slate-600 text-xs">Late</div></div>
+      <div class="p-3 rounded-xl bg-red-400/8 border border-red-400/15 text-center"><div class="text-red-400 font-bold text-lg">${absent}</div><div class="text-slate-600 text-xs">Absent</div></div>
+    </div>
+    <div class="pbar mb-4"><div class="pfill" style="width:${pct}%"></div></div>
+    <p class="text-center text-violet-400 font-bold text-sm mb-4">Overall Attendance: ${pct}%</p>
+    ${!records.length ? '<div class="text-slate-600 text-xs text-center py-4">No attendance records yet</div>' :
+    `<div class="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+      ${records.map(r=>`
+        <div class="flex items-center justify-between p-2.5 rounded-lg bg-violet-400/5 border border-violet-400/10">
+          <div>
+            <p class="text-white text-xs font-semibold">${r.date}</p>
+            <p class="text-slate-600 text-xs">${r.session||'class'}</p>
+          </div>
+          <span class="badge ${r.status==='present'?'bg3':r.status==='late'?'bw2':'br2'}">${r.status}</span>
+        </div>`).join('')}
+    </div>`}`;
+}
+
+async function loadBatchClassmates() {
+  const el = document.getElementById('studentBatchTab-classmates');
+  const snap = await getDocs(query(collection(db,'batchEnrollments'), where('batchId','==',currentStudentBatchId)));
+  const students = snap.docs.map(d=>d.data()).sort((a,b)=>a.studentName.localeCompare(b.studentName));
+  el.innerHTML = `<p class="text-slate-500 text-xs mb-3">${students.length} students in this batch</p>
+    <div class="space-y-1.5 max-h-96 overflow-y-auto pr-1">
+      ${students.map((s,i)=>`
+        <div class="flex items-center gap-3 p-2.5 rounded-lg bg-violet-400/5 border border-violet-400/10">
+          <div class="w-7 h-7 rounded-lg bg-violet-400/20 flex items-center justify-center text-xs font-bold text-violet-400">${i+1}</div>
+          <div class="flex-1">
+            <p class="text-white text-xs font-semibold">${s.studentName} ${s.studentId===session.userId?'<span class="badge bv2 text-xs ml-1">You</span>':''}</p>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── MY FEES ───────────────────────────────────────────────────
+async function loadMyFees() {
+  const el = document.getElementById('myFeesList');
+  el.innerHTML = '<div class="gc p-6 text-center text-slate-500 text-sm">Loading...</div>';
+  try {
+    // Get fee records from admin's feeRecords collection
+    const snap = await getDocs(query(collection(db,'feeRecords'), where('studentId','==',session.userId)));
+    const records = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+      const da = a.paymentDate||''; const db2 = b.paymentDate||'';
+      return db2.localeCompare(da);
+    });
+    // Get course data for enrolled courses (including fees/discount)
+    const courseSnap = await getDocs(query(collection(db,'courses')));
+    const courseMap = {};
+    courseSnap.docs.forEach(d=>{ courseMap[d.id] = {id:d.id,...d.data()}; });
+    // Calculate totals
+    let totalFees = 0, totalPaid = 0, totalDiscount = 0;
+    const byCourse = {};
+    myEnrollments.forEach(e => {
+      const c = courseMap[e.courseId];
+      if (!c) return;
+      const courseFee = c.fees||0;
+      const discount = c.discountAmount||0;
+      const discountType = c.discountType||'amount';
+      const discountAmt = discountType==='percent' ? Math.round(courseFee*(discount/100)) : discount;
+      const netFee = Math.max(0, courseFee - discountAmt);
+      byCourse[e.courseId] = { course:c, courseFee, discountAmt, netFee, payments:[], paid:0, balance:netFee };
+    });
+    records.forEach(r => {
+      if (!byCourse[r.courseId]) {
+        byCourse[r.courseId] = { course:courseMap[r.courseId]||{name:r.courseName||'Course'}, courseFee:r.totalFee||0, discountAmt:0, netFee:r.totalFee||0, payments:[], paid:0, balance:0 };
+      }
+      byCourse[r.courseId].payments.push(r);
+      byCourse[r.courseId].paid += (r.amount||0);
+    });
+    // Recalculate balance
+    Object.values(byCourse).forEach(c => {
+      c.balance = Math.max(0, c.netFee - c.paid);
+      totalFees += c.netFee;
+      totalPaid += c.paid;
+      totalDiscount += c.discountAmt;
+    });
+    document.getElementById('myFeesTotal').textContent = '₹' + totalFees.toLocaleString('en-IN');
+    document.getElementById('myFeesPaid').textContent = '₹' + totalPaid.toLocaleString('en-IN');
+    document.getElementById('myFeesDue').textContent = '₹' + Math.max(0,totalFees-totalPaid).toLocaleString('en-IN');
+    document.getElementById('myFeesDiscount').textContent = '₹' + totalDiscount.toLocaleString('en-IN');
+    const entries = Object.values(byCourse);
+    if (!entries.length) { el.innerHTML = '<div class="gc p-8 text-center text-slate-600">No fee records found. Contact admin.</div>'; return; }
+    el.innerHTML = entries.map(entry => {
+      const c = entry.course;
+      const paidPct = entry.netFee ? Math.min(100,(entry.paid/entry.netFee)*100).toFixed(0) : 0;
+      const feeStatus = entry.balance <= 0 ? 'paid' : entry.paid > 0 ? 'partial' : 'pending';
+      const statusBadge = {paid:'bg-green-400/12 text-green-400 border-green-400/28',partial:'bg-yellow-400/12 text-yellow-400 border-yellow-400/28',pending:'bg-red-400/12 text-red-400 border-red-400/28'}[feeStatus];
+      return `<div class="gc p-5">
+        <div class="flex items-start justify-between flex-wrap gap-3 mb-4">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <h4 class="text-white font-bold text-sm">${c.name||'Course'}</h4>
+              <span class="badge border text-xs ${statusBadge}">${feeStatus}</span>
+            </div>
+            <p class="text-slate-500 text-xs">${c.subject||''}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-white font-bold text-lg">₹${entry.netFee.toLocaleString('en-IN')}</p>
+            ${entry.discountAmt > 0 ? `<p class="text-yellow-400 text-xs">🏷 Discount: ₹${entry.discountAmt.toLocaleString('en-IN')}${c.discountType==='percent'?' ('+c.discountAmount+'%)':''} <span class="text-slate-600 line-through text-xs">₹${entry.courseFee.toLocaleString('en-IN')}</span></p>` : ''}
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div class="p-2.5 rounded-xl bg-green-400/6 border border-green-400/15 text-center">
+            <div class="text-green-400 font-bold">₹${entry.paid.toLocaleString('en-IN')}</div>
+            <div class="text-slate-600 text-xs">Paid</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-red-400/6 border border-red-400/15 text-center">
+            <div class="text-red-400 font-bold">₹${entry.balance.toLocaleString('en-IN')}</div>
+            <div class="text-slate-600 text-xs">Balance</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-violet-400/6 border border-violet-400/15 text-center">
+            <div class="text-violet-400 font-bold">${paidPct}%</div>
+            <div class="text-slate-600 text-xs">Paid %</div>
+          </div>
+        </div>
+        <div class="pbar mb-4"><div class="pfill" style="width:${paidPct}%"></div></div>
+        ${entry.payments.length ? `
+        <div class="mt-3">
+          <p class="text-slate-500 text-xs font-semibold mb-2 uppercase tracking-wider">Payment History</p>
+          <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+            ${entry.payments.map(p=>`
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-violet-400/5 border border-violet-400/10">
+                <div>
+                  <p class="text-white text-xs font-semibold">₹${(p.amount||0).toLocaleString('en-IN')}</p>
+                  <p class="text-slate-600 text-xs">${p.paymentDate||''} · ${p.paymentMode||'–'}</p>
+                </div>
+                <div class="text-right">
+                  <span class="badge ${p.status==='paid'?'bg3':p.status==='partial'?'bw2':'br2'} text-xs">${p.status||'paid'}</span>
+                  ${p.remarks?`<p class="text-slate-700 text-xs italic mt-0.5">${p.remarks}</p>`:''}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>` : '<p class="text-slate-700 text-xs text-center">No payment records yet</p>'}
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="gc p-6 text-center text-red-400">Error loading fees: ' + e.message + '</div>'; }
+}
+
+// ── NOTIFICATIONS (Real-time) ─────────────────────────────────
+function listenNotifications() {
+  const q = query(collection(db,'notifications'), orderBy('createdAt','desc'));
+  notifUnsub = onSnapshot(q, (snap) => {
+    const all = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const mine = all.filter(n => n.target==='all' || n.target==='student' || n.target===session.userId);
+    renderNotifications(mine);
+    const unread = mine.filter(n => !n.readBy?.includes(session.userId)).length;
+    document.getElementById('dNotifs').textContent = unread;
+    ['sbNotifBadge','hNotifBadge'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = unread; el.classList.toggle('hidden',unread===0);
+    });
+  });
+}
+
+function renderNotifications(list) {
+  const el = document.getElementById('notifList');
+  if (!list.length) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">No notifications</div>'; return; }
+  const borders = {urgent:'border-red-400/30',important:'border-orange-400/30',normal:'border-violet-400/10'};
+  const dots = {urgent:'bg-red-400',important:'bg-orange-400',normal:'bg-violet-400'};
+  el.innerHTML = list.map(n => {
+    const isRead = n.readBy?.includes(session.userId);
+    return `<div class="gc p-4 border ${borders[n.priority]||borders.normal} ${isRead?'opacity-55':''}">
+      <div class="flex items-start gap-3">
+        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isRead?'bg-slate-700':dots[n.priority]||'bg-violet-400'}"></div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <p class="text-white text-sm font-semibold">${n.title}</p>
+            <span class="badge ${n.priority==='urgent'?'br2':n.priority==='important'?'bw2':'bv2'}">${n.priority}</span>
+          </div>
+          <p class="text-slate-400 text-xs leading-relaxed">${n.message}</p>
+          <div class="flex items-center justify-between mt-2">
+            <p class="text-slate-600 text-xs">${n.createdAt?.toDate?n.createdAt.toDate().toLocaleDateString('en-IN'):''}</p>
+            ${!isRead?`<button onclick="markRead('${n.id}')" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">Mark read</button>`:'<span class="text-xs text-slate-700">Read</span>'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.markRead = async (id) => {
+  const nd = await getDoc(doc(db,'notifications',id));
+  const readBy = nd.data().readBy||[];
+  if (!readBy.includes(session.userId)) readBy.push(session.userId);
+  await updateDoc(doc(db,'notifications',id), {readBy});
+};
+
+// ── HELPERS ───────────────────────────────────────────────────
+window.showModal = (html) => { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalBg').classList.remove('hidden'); };
+window.closeModal = (e) => { if (!e || e.target===document.getElementById('modalBg')) document.getElementById('modalBg').classList.add('hidden'); };
+window.toast = (msg, type='info') => {
+  const el = document.createElement('div');
+  el.className = 'toast t' + type[0];
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+};
+
+// Prevent right-click during exam
+document.addEventListener('contextmenu', e => { if (activeExam) e.preventDefault(); });
+
+initApp();
+})();
+</script>
+</body>
+</html>
