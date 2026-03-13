@@ -169,14 +169,14 @@
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>My Profile
       </div>
       <div class="ns">Courses & Classes</div>
+      <div class="ni" onclick="showSec('explore')">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>🔍 Explore Courses
+      </div>
       <div class="ni" onclick="showSec('courses')">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>My Courses
       </div>
       <div class="ni" onclick="showSec('batches')">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>My Batches
-      </div>
-      <div class="ni" onclick="showSec('topics')">
-        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>Topic-wise Classes
       </div>
       <div class="ni" onclick="showSec('schedule')">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Class Schedule
@@ -253,42 +253,99 @@
 
       <!-- DASHBOARD -->
       <div id="sec-dashboard" class="sec active">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="sc"><div class="text-xs text-slate-500 mb-1">Enrolled Courses</div><div id="dCourses" class="text-2xl font-bold text-violet-400">0</div></div>
-          <div class="sc"><div class="text-xs text-slate-500 mb-1">Attendance %</div><div id="dAtt" class="text-2xl font-bold text-green-400">0%</div></div>
-          <div class="sc"><div class="text-xs text-slate-500 mb-1">Pending Homework</div><div id="dHomework" class="text-2xl font-bold text-rose-400">0</div></div>
-          <div class="sc"><div class="text-xs text-slate-500 mb-1">Notifications</div><div id="dNotifs" class="text-2xl font-bold text-yellow-400">0</div></div>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-          <div class="gc p-5"><h3 class="text-sm font-semibold text-slate-300 mb-4">Performance Overview</h3><canvas id="chartPerf" height="210"></canvas></div>
-          <div class="gc p-5">
-            <h3 class="text-sm font-semibold text-slate-300 mb-4">Join a Course</h3>
-            <div class="space-y-3">
-              <p class="text-slate-500 text-xs">Enter the 6-character join code given by your teacher.</p>
-              <div class="flex gap-2">
-                <input id="joinCodeInput" class="inp flex-1" placeholder="e.g. ABC123" maxlength="6" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.15em;text-transform:uppercase"/>
-                <button onclick="joinCourse()" class="btn bp whitespace-nowrap">Join Course</button>
-              </div>
-              <div id="joinResult" class="hidden"></div>
+        <!-- Greeting -->
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-white">Good <span id="dashGreeting">Morning</span>, <span id="dashStudentName" class="text-violet-400"></span>! ✨</h2>
+            <p class="text-slate-500 text-xs mt-0.5" id="dashDateLine"></p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <div id="specialOffersBox" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl cursor-pointer" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3)" onclick="document.getElementById('dashOffersPanel').classList.toggle('hidden')">
+              <span class="text-yellow-400 text-xs font-semibold">🎁 <span id="offerCountBadge"></span> Offer!</span>
             </div>
-            <div class="mt-5">
-              <h4 class="text-xs text-slate-500 font-semibold mb-3 uppercase tracking-wider">My Enrolled Courses</h4>
-              <div id="dashCourseList" class="space-y-2"></div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl" style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2)">
+              <div class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></div>
+              <span class="text-violet-400 text-xs font-semibold">My Dashboard</span>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div class="gc p-5">
-            <h3 class="text-sm font-semibold text-slate-300 mb-4">📅 Today's Classes</h3>
-            <div id="todayClassesDash" class="space-y-2"><div class="text-slate-600 text-xs text-center py-4">Loading schedule...</div></div>
+
+        <!-- Special Offers Panel (collapsible) -->
+        <div id="dashOffersPanel" class="hidden mb-4 p-4 rounded-xl" style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,113,133,0.05));border:1px solid rgba(251,191,36,0.25)">
+          <h4 class="text-yellow-400 text-sm font-bold mb-3">🎁 Special Offers for You</h4>
+          <div id="specialOffersList" class="space-y-2"></div>
+        </div>
+
+        <!-- Stat Cards Row 1 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div class="sc cursor-pointer hover:scale-[1.02] transition-transform" onclick="showSec('courses')">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style="background:rgba(167,139,250,0.15)"><span>📚</span></div>
+            <div id="dCourses" class="text-2xl font-bold text-violet-400">0</div>
+            <div class="text-xs text-slate-500">Enrolled Courses</div>
           </div>
-          <div class="gc p-5">
-            <div class="flex items-center justify-between mb-4">
+          <div class="sc cursor-pointer hover:scale-[1.02] transition-transform" onclick="showSec('attendance')">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style="background:rgba(52,211,153,0.15)"><span>✅</span></div>
+            <div id="dAtt" class="text-2xl font-bold text-green-400">0%</div>
+            <div class="text-xs text-slate-500">Attendance</div>
+            <div class="mt-2 h-0.5 rounded-full bg-green-400/10"><div id="dAttBar" class="h-full rounded-full bg-green-400/50 transition-all" style="width:0%"></div></div>
+          </div>
+          <div class="sc cursor-pointer hover:scale-[1.02] transition-transform" onclick="showSec('homework')">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style="background:rgba(248,113,113,0.15)"><span>📝</span></div>
+            <div id="dHomework" class="text-2xl font-bold text-rose-400">0</div>
+            <div class="text-xs text-slate-500">Pending HW</div>
+          </div>
+          <div class="sc cursor-pointer hover:scale-[1.02] transition-transform" onclick="showSec('results')">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style="background:rgba(251,191,36,0.15)"><span>🏆</span></div>
+            <div id="dAvgScore" class="text-2xl font-bold text-yellow-400">—</div>
+            <div class="text-xs text-slate-500">Avg Score</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <div class="gc p-4 lg:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-300">📊 Performance Overview</h3>
+              <button onclick="showSec('results')" class="text-violet-400 text-xs hover:text-violet-300">Details →</button>
+            </div>
+            <canvas id="chartPerf" height="160"></canvas>
+          </div>
+          <div class="gc p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-300">✅ Attendance</h3>
+            </div>
+            <canvas id="chartAtt" height="160"></canvas>
+            <p id="dNotifs" class="hidden">0</p>
+          </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Today Classes -->
+          <div class="gc p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-300">📅 Today's Classes</h3>
+              <button onclick="showSec('schedule')" class="text-violet-400 text-xs hover:text-violet-300">All →</button>
+            </div>
+            <div id="todayClassesDash" class="space-y-2"><div class="text-slate-600 text-xs text-center py-4">Loading...</div></div>
+          </div>
+          <!-- Pending HW -->
+          <div class="gc p-4">
+            <div class="flex items-center justify-between mb-3">
               <h3 class="text-sm font-semibold text-slate-300">📝 Pending Homework</h3>
-              <button onclick="showSec('homework')" class="text-violet-400 hover:text-violet-300 text-xs transition-colors">View All →</button>
+              <button onclick="showSec('homework')" class="text-violet-400 text-xs hover:text-violet-300">All →</button>
             </div>
             <div id="pendingHwDash" class="space-y-2"><div class="text-slate-600 text-xs text-center py-4">Loading...</div></div>
+          </div>
+          <!-- My Courses + CTA -->
+          <div class="gc p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-300">🎓 My Courses</h3>
+              <button onclick="showSec('explore')" class="text-violet-400 text-xs hover:text-violet-300">Explore →</button>
             </div>
+            <div id="dashCourseList" class="space-y-2 mb-3"></div>
+            <button onclick="showSec('explore')" class="w-full py-2 rounded-xl text-xs font-semibold transition-all hover:scale-[1.02]" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);color:#a78bfa">🔍 Browse &amp; Inquire</button>
+          </div>
         </div>
       </div>
 
@@ -314,8 +371,12 @@
               <div><label class="lbl">Full Name</label><input id="pName" class="inp"/></div>
               <div><label class="lbl">User ID <span class="text-slate-700 text-xs font-normal">(cannot be changed)</span></label><input id="pUserId" class="inp" readonly style="opacity:0.5;cursor:not-allowed;background:rgba(9,6,22,0.5)"/></div>
               <div><label class="lbl">Phone</label><input id="pPhone" class="inp"/></div>
+              <div><label class="lbl">Email</label><input id="pEmail" class="inp" type="email"/></div>
+              <div><label class="lbl">Date of Birth</label><input id="pDOB" class="inp" type="date"/></div>
+              <div><label class="lbl">Gender</label><select id="pGender" class="inp"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
               <div><label class="lbl">Guardian Name</label><input id="pGuardian" class="inp"/></div>
-              <div><label class="lbl">Address</label><input id="pAddress" class="inp"/></div>
+              <div><label class="lbl">Guardian Phone</label><input id="pGPhone" class="inp"/></div>
+              <div class="md:col-span-2"><label class="lbl">Address</label><input id="pAddress" class="inp"/></div>
               <div><label class="lbl">New Password</label><input id="pPass" class="inp" type="password" placeholder="Leave blank to keep"/></div>
             </div>
             <button onclick="saveProfile()" class="btn bp mt-5">Save Changes</button>
@@ -324,12 +385,76 @@
       </div>
 
       <!-- COURSES -->
-      <div id="sec-courses" class="sec">
-        <div class="flex flex-col sm:flex-row gap-3 mb-4">
-          <div class="flex gap-2 flex-1">
-            <input id="joinCode2" class="inp" placeholder="Join with code (e.g. ABC123)" maxlength="6" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.1em"/>
-            <button onclick="joinCourse2()" class="btn bp whitespace-nowrap">Join</button>
+      <!-- EXPLORE COURSES & ADMISSION QUERY -->
+      <div id="sec-explore" class="sec">
+        <!-- Hero Banner -->
+        <div class="gc p-6 mb-5 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(167,139,250,0.12),rgba(251,113,133,0.08));border-color:rgba(167,139,250,0.25)">
+          <div class="relative z-10">
+            <h2 class="text-2xl font-display font-bold text-white mb-1">Explore Our Courses</h2>
+            <p class="text-slate-400 text-sm mb-4">Discover all available courses at Vision IT Computer Institute. Send an admission inquiry and our team will get back to you.</p>
+            <div class="flex flex-wrap gap-3">
+              <div class="flex gap-2 flex-1 max-w-xs">
+                <input id="exploreSearch" oninput="filterExploreCourses()" class="inp flex-1" placeholder="🔍 Search courses..."/>
+              </div>
+              <button onclick="openAdmissionQueryForm(null)" class="btn bp whitespace-nowrap">📩 Admission Inquiry</button>
+            </div>
           </div>
+          <div class="absolute -right-8 -top-8 w-48 h-48 rounded-full opacity-5" style="background:radial-gradient(circle,#a78bfa,transparent)"></div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex flex-wrap gap-2 mb-3">
+          <select id="exploreCatFilter" class="inp w-auto text-xs" onchange="filterExploreCourses()" style="min-width:140px">
+            <option value="">📂 All Categories</option>
+          </select>
+          <select id="exploreFeeFilter" class="inp w-auto text-xs" onchange="filterExploreCourses()">
+            <option value="">💰 All Types</option>
+            <option value="free">🟢 Free Only</option>
+            <option value="paid">💳 Paid Only</option>
+          </select>
+        </div>
+
+        <!-- Category Pills -->
+        <div id="explorePills" class="flex flex-wrap gap-2 mb-5"></div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <div class="gc p-4 text-center">
+            <div id="expTotalCourses" class="text-2xl font-bold text-violet-400">0</div>
+            <div class="text-slate-500 text-xs mt-0.5">Total Courses</div>
+          </div>
+          <div class="gc p-4 text-center">
+            <div id="expFreeCourses" class="text-2xl font-bold text-emerald-400">0</div>
+            <div class="text-slate-500 text-xs mt-0.5">Free Courses</div>
+          </div>
+          <div class="gc p-4 text-center">
+            <div id="expTeachers" class="text-2xl font-bold text-sky-400">0</div>
+            <div class="text-slate-500 text-xs mt-0.5">Teachers</div>
+          </div>
+        </div>
+
+        <!-- Courses Grid -->
+        <div id="exploreGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="gc p-8 text-center text-slate-600 col-span-full">Loading available courses...</div>
+        </div>
+
+        <!-- My Queries Section -->
+        <div class="mt-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-white text-sm">📩 My Admission Queries</h3>
+            <button onclick="loadMyQueries()" class="text-xs text-violet-400 hover:text-violet-300">Refresh</button>
+          </div>
+          <div id="myQueriesList" class="space-y-3">
+            <div class="gc p-4 text-center text-slate-600 text-sm">No queries sent yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY COURSES -->
+      <div id="sec-courses" class="sec">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-slate-500 text-sm">Your enrolled courses are shown below. Contact admin to enroll in new courses.</p>
+          <button onclick="showSec('explore')" class="btn bp whitespace-nowrap text-xs">🔍 Explore Courses</button>
         </div>
         <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="gc p-6 text-center text-slate-600 col-span-full">Loading your courses...</div>
@@ -361,14 +486,6 @@
             <div id="studentBatchTab-classmates" class="hidden"></div>
           </div>
         </div>
-      </div>
-
-      <!-- TOPIC-WISE CLASSES -->
-      <div id="sec-topics" class="sec">
-        <div class="mb-5">
-          <select id="topicCourseFilter" class="inp" style="max-width:300px" onchange="loadStudentTopics()"><option value="">Select Course</option></select>
-        </div>
-        <div id="studentTopicsList" class="space-y-3"><div class="gc p-6 text-center text-slate-600">Select a course to view topics</div></div>
       </div>
 
       <!-- CLASS SCHEDULE -->
@@ -519,10 +636,10 @@
           <!-- Quick stats -->
           <div class="grid grid-cols-3 gap-3 mt-4">
             <div class="rounded-xl p-2.5 text-center" style="background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.15)">
-              <div id="sCurStatU" class="text-lg font-bold text-violet-400">0</div><div class="text-slate-600 text-xs">Units</div>
+              <div id="sCurStatU" class="text-lg font-bold text-violet-400">0</div><div class="text-slate-600 text-xs">Modules</div>
             </div>
             <div class="rounded-xl p-2.5 text-center" style="background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.15)">
-              <div id="sCurStatL" class="text-lg font-bold text-sky-400">0</div><div class="text-slate-600 text-xs">Lessons</div>
+              <div id="sCurStatL" class="text-lg font-bold text-sky-400">0</div><div class="text-slate-600 text-xs">Titles</div>
             </div>
             <div class="rounded-xl p-2.5 text-center" style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.15)">
               <div id="sCurStatD" class="text-lg font-bold text-green-400">0</div><div class="text-slate-600 text-xs">Completed</div>
@@ -585,8 +702,9 @@
 
       <!-- RESULTS -->
       <div id="sec-results" class="sec">
-        <div class="flex gap-3 mb-5">
+        <div class="flex gap-3 mb-5 flex-wrap">
           <select id="resultCourse" class="inp" onchange="loadMyResults()"><option value="">All Courses</option></select>
+          <button onclick="studentDownloadMarksheet()" class="btn bv whitespace-nowrap">🎓 Download Marksheet</button>
         </div>
         <div class="grid grid-cols-1 gap-5">
           <div class="gc p-5"><h3 class="text-sm font-semibold text-slate-300 mb-3">Performance Chart</h3><canvas id="chartMyResults" height="150"></canvas></div>
@@ -793,9 +911,9 @@ const db = getFirestore(app);
 
 // ── GLOBALS ──────────────────────────────────────────────────
 let session = null;
-let myEnrollments = [], myCourseDocs = [];
+let myEnrollments = [], myCourseDocs = [], enrolledCourses = [];
 let notifUnsub = null, hwUnsub = null;
-let chartPerf = null, chartMyResults = null;
+let chartPerf = null, chartMyResults = null; // legacy refs
 // Exam state
 let activeExam = null, examAnswers = {}, currentQIdx = 0;
 let examTimer = null, tabSwitchCount = 0;
@@ -856,6 +974,7 @@ function showApp() {
   document.getElementById('hwDateFilter').value = new Date().toISOString().split('T')[0];
   loadProfile();
   loadMyEnrollments();
+  loadSpecialOffers();
   listenNotifications();
   listenHomeworkUpdates();
 }
@@ -881,14 +1000,13 @@ window.showSec = (sec) => {
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-' + sec).classList.add('active');
   document.querySelectorAll('.ni').forEach(n => { if (n.getAttribute('onclick')?.includes("'" + sec + "'")) n.classList.add('active'); });
-  const titles = {dashboard:'Dashboard',profile:'My Profile',courses:'My Courses',batches:'My Batches',topics:'Topic-wise Classes',schedule:'Class Schedule',materials:'Class Materials',videos:'🎬 Online Classes',curriculum:'📋 Curriculum',attendance:'My Attendance',homework:'Daily Homework',results:'Results & Rank',exams:'Online Exams',downloads:'Downloads',fees:'My Fees',notifications:'Notifications'};
+  const titles = {dashboard:'Dashboard',profile:'My Profile',explore:'🔍 Explore Courses',courses:'My Courses',batches:'My Batches',schedule:'Class Schedule',materials:'Class Materials',videos:'🎬 Online Classes',curriculum:'📋 Curriculum',attendance:'My Attendance',homework:'Daily Homework',results:'Results & Rank',exams:'Online Exams',downloads:'Downloads',fees:'My Fees',notifications:'Notifications'};
   document.getElementById('pgTitle').textContent = titles[sec]||sec;
   if (window.innerWidth < 1024) document.getElementById('sidebar').style.transform = 'translateX(-100%)';
   if (sec === 'attendance') { populateAttFilter(); loadMyAtt(); }
   if (sec === 'results') { populateResultFilter(); }
   if (sec === 'exams') loadExams();
   if (sec === 'downloads') populateDownloadSelects();
-  if (sec === 'topics') populateStudentTopicFilter();
   if (sec === 'schedule') populateStudentSchedFilter();
   if (sec === 'materials') populateStudentMatFilters();
   if (sec === 'videos') initStudentVideos();
@@ -896,6 +1014,7 @@ window.showSec = (sec) => {
   if (sec === 'homework') { populateStudentHwFilters(); loadStudentHomework(); }
   if (sec === 'batches') loadStudentBatches();
   if (sec === 'fees') loadMyFees();
+  if (sec === 'explore') initExploreCourses();
 };
 
 // ── PROFILE ───────────────────────────────────────────────────
@@ -906,7 +1025,11 @@ async function loadProfile() {
   document.getElementById('pName').value = data.name||'';
   document.getElementById('pUserId').value = data.userId||'';
   document.getElementById('pPhone').value = data.phone||'';
+  document.getElementById('pEmail').value = data.email||'';
+  document.getElementById('pDOB').value = data.dob||'';
+  document.getElementById('pGender').value = data.gender||'';
   document.getElementById('pGuardian').value = data.guardianName||'';
+  document.getElementById('pGPhone').value = data.guardianPhone||'';
   document.getElementById('pAddress').value = data.address||'';
   document.getElementById('profName').textContent = data.name;
   document.getElementById('profId').textContent = data.userId;
@@ -915,12 +1038,16 @@ async function loadProfile() {
 window.saveProfile = async () => {
   const name = document.getElementById('pName').value.trim();
   const phone = document.getElementById('pPhone').value.trim();
+  const email = document.getElementById('pEmail').value.trim();
+  const dob = document.getElementById('pDOB').value;
+  const gender = document.getElementById('pGender').value;
   const guardianName = document.getElementById('pGuardian').value.trim();
+  const guardianPhone = document.getElementById('pGPhone').value.trim();
   const address = document.getElementById('pAddress').value.trim();
   const pass = document.getElementById('pPass').value;
   if (!name) return toast('Name is required','error');
   try {
-    const upd = {name, phone, guardianName, address, updatedAt:serverTimestamp()};
+    const upd = {name, phone, email, dob, gender, guardianName, guardianPhone, address, updatedAt:serverTimestamp()};
     if (pass) upd.password = pass;
     await updateDoc(doc(db,'users',session.userId), upd);
     session.name = name;
@@ -959,6 +1086,8 @@ async function loadMyEnrollments() {
       if (cd.exists()) myCourseDocs.push({id:cd.id,...cd.data()});
     } catch(e) {}
   }
+  // Build enrolledCourses list for selects (curriculum, downloads etc.)
+  enrolledCourses = myCourseDocs.map(c=>({id:c.id, name:c.name}));
   renderCourses();
   loadDashboard();
   renderDashCourseList();
@@ -967,23 +1096,50 @@ async function loadMyEnrollments() {
 function renderCourses() {
   const grid = document.getElementById('coursesGrid');
   if (!myCourseDocs.length) {
-    grid.innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full">No courses enrolled yet. Use a join code to enroll!</div>';
+    grid.innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full"><div class="text-4xl mb-3">📚</div><p class="mb-3">No courses enrolled yet.</p><button onclick="showSec(\'explore\')" class="btn bp text-xs">Explore Courses</button></div>';
     return;
   }
-  grid.innerHTML = myCourseDocs.map(c => {
+  // Sort: active first, upcoming second, expired last
+  const sorted = [...myCourseDocs].sort((a,b) => {
+    const order = {active:0, 'no-date':0, upcoming:1, expired:2};
+    return (order[getCourseStatus(a)]||0) - (order[getCourseStatus(b)]||0);
+  });
+  grid.innerHTML = sorted.map(c => {
     const netFee = c.netFee || c.fees || 0;
     const discAmt = c.discountAmt || 0;
+    const cs = getCourseStatus(c);
+    const isExpired = cs === 'expired';
+    const isUpcoming = cs === 'upcoming';
+    let statusBadge = '';
+    let dateTag = '';
+    if (isExpired) {
+      statusBadge = `<span class="badge" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);font-size:10px">⛔ Expired</span>`;
+      dateTag = `<p class="text-red-400 text-xs mb-2">Ended: ${c.endDate}</p>`;
+    } else if (isUpcoming) {
+      const dl = Math.ceil((new Date(c.startDate) - new Date()) / 86400000);
+      statusBadge = `<span class="badge" style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);font-size:10px">🕐 Upcoming</span>`;
+      dateTag = `<p class="text-yellow-400 text-xs mb-2">Starts in ${dl} day${dl!==1?'s':''} · ${c.startDate}</p>`;
+    } else if (c.endDate) {
+      const rem = Math.ceil((new Date(c.endDate) - new Date()) / 86400000);
+      statusBadge = `<span class="badge" style="background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25);font-size:10px">✅ Active</span>`;
+      dateTag = `<p class="text-emerald-400 text-xs mb-2">Ends in ${rem} day${rem!==1?'s':''} · ${c.endDate}</p>`;
+    }
     return `
-    <div class="gc p-5 hover:border-violet-400/25 transition-all">
-      ${c.bannerUrl ? `<img src="${c.bannerUrl}" class="w-full h-28 object-cover rounded-lg mb-3"/>` : `<div class="w-full h-28 rounded-lg mb-3 flex items-center justify-center bg-gradient-to-br from-violet-400/15 to-rose-400/15"><span class="text-3xl">📚</span></div>`}
-      <h4 class="font-bold text-white text-sm mb-1">${c.name}</h4>
-      <p class="text-slate-500 text-xs mb-1">${c.subject||''}</p>
-      <p class="text-slate-600 text-xs mb-2">Teacher: <span class="text-violet-400">${c.teacherName||'-'}</span></p>
-      ${c.duration ? `<p class="text-slate-600 text-xs mb-2">⏱ ${c.duration}</p>` : ''}
-      ${netFee > 0 ? `<div class="flex items-center gap-2 mt-2">
+    <div class="gc p-5 hover:border-violet-400/25 transition-all${isExpired?' opacity-50':''}">
+      ${c.bannerUrl ? `<img src="${c.bannerUrl}" class="w-full h-28 object-cover rounded-lg mb-3"/>` : `<div class="w-full h-28 rounded-lg mb-3 flex items-center justify-center bg-gradient-to-br from-violet-400/15 to-rose-400/15"><span class="text-3xl">${isUpcoming?'🕐':isExpired?'📦':'📚'}</span></div>`}
+      <div class="flex items-start justify-between gap-2 mb-1">
+        <h4 class="font-bold text-white text-sm">${c.name}</h4>
+        ${statusBadge}
+      </div>
+      <p class="text-slate-500 text-xs mb-1">${c.description||c.subject||''}</p>
+      <p class="text-slate-600 text-xs mb-1">Teacher: <span class="text-violet-400">${c.teacherName||'-'}</span></p>
+      ${dateTag}
+      ${netFee > 0 ? `<div class="flex items-center gap-2 mt-1">
         <span class="text-violet-400 font-bold text-sm">₹${netFee.toLocaleString('en-IN')}</span>
-        ${discAmt > 0 ? `<span class="text-slate-600 line-through text-xs">₹${(c.fees||0).toLocaleString('en-IN')}</span><span class="badge bw2 text-xs">🏷 ${c.discountType==='percent'?c.discountAmount+'% off':'₹'+discAmt+' off'}</span>` : ''}
-      </div>` : '<p class="text-green-400 text-xs mt-2">Free Course</p>'}
+        ${discAmt > 0 ? `<span class="text-slate-600 line-through text-xs">₹${(c.fees||0).toLocaleString('en-IN')}</span>` : ''}
+      </div>` : '<p class="text-green-400 text-xs">Free Course</p>'}
+      ${isExpired ? `<p class="text-red-400/60 text-xs mt-2 italic">This course has ended. Content may not be accessible.</p>` : ''}
+      ${isUpcoming ? `<p class="text-yellow-400/70 text-xs mt-2 italic">Course content will be available on start date.</p>` : ''}
     </div>`;
   }).join('');
 }
@@ -1003,73 +1159,152 @@ function renderDashCourseList() {
   `).join('');
 }
 
+let chartPerfS = null, chartAttS = null;
+
 async function loadDashboard() {
-  document.getElementById('dCourses').textContent = myCourseDocs.length;
-  if (session) {
-    const attSnap = await getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId)));
-    const atts = attSnap.docs.map(d => d.data());
-    const pct = atts.length ? ((atts.filter(a=>a.status==='present').length/atts.length)*100).toFixed(0) : 0;
-    document.getElementById('dAtt').textContent = pct + '%';
-    renderPerfChart();
-    loadTodayScheduleDash();
-    loadPendingHwDash();
-  }
+  // Greeting
+  const hr = new Date().getHours();
+  const greetEl = document.getElementById('dashGreeting');
+  const nameEl = document.getElementById('dashStudentName');
+  const dateLine = document.getElementById('dashDateLine');
+  if(greetEl) greetEl.textContent = hr<12?'Morning':hr<17?'Afternoon':'Evening';
+  if(nameEl) nameEl.textContent = session.name?.split(' ')[0]||'Student';
+  if(dateLine) dateLine.textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Animate course count
+  const cEl = document.getElementById('dCourses');
+  if(cEl){ let v=0,target=myCourseDocs.length,st=Math.ceil(target/20)||1; const t=setInterval(()=>{v=Math.min(v+st,target);cEl.textContent=v;if(v>=target)clearInterval(t);},50); }
+
+  if (!session) return;
+
+  // Fetch all student data in parallel
+  const [attSnap, hwSnap, subSnap, testSnap, notifSnap] = await Promise.all([
+    getDocs(query(collection(db,'attendance'), where('studentId','==',session.userId))),
+    getDocs(query(collection(db,'homeworks'), where('courseId','in', myCourseDocs.length?myCourseDocs.map(c=>c.id):['_']))).catch(()=>({docs:[]})),
+    getDocs(query(collection(db,'hwSubmissions'), where('studentId','==',session.userId))),
+    getDocs(query(collection(db,'examAttempts'), where('studentId','==',session.userId))).catch(()=>({docs:[]})),
+    getDocs(query(collection(db,'notifications'), where('targetStudentId','==',session.userId), where('read','==',false))).catch(()=>({size:0,docs:[]}))
+  ]);
+
+  // Attendance
+  const atts = attSnap.docs.map(d=>d.data());
+  const present = atts.filter(a=>a.status==='present').length;
+  const pct = atts.length ? Math.round(present/atts.length*100) : 0;
+  document.getElementById('dAtt').textContent = pct+'%';
+  setTimeout(()=>{ const b=document.getElementById('dAttBar'); if(b) b.style.width=pct+'%'; },400);
+
+  // Pending HW
+  const submittedIds = new Set(subSnap.docs.map(d=>d.data().hwId));
+  const pendingHWs = hwSnap.docs.filter(d=>!submittedIds.has(d.id) && d.data().isActive!==false);
+  document.getElementById('dHomework').textContent = pendingHWs.length;
+
+  // Avg score
+  const attempts = testSnap.docs.map(d=>d.data());
+  const avgScore = attempts.length ? Math.round(attempts.reduce((s,a)=>(s+(a.score||0)/(a.total||1)*100),0)/attempts.length) : null;
+  document.getElementById('dAvgScore').textContent = avgScore!=null ? avgScore+'%' : '—';
+
+  renderStudentPerfChart(atts, attempts);
+  renderAttChart(atts);
+  loadTodayScheduleDash();
+  loadPendingHwDash();
+  renderDashCourseList();
 }
 
-async function renderPerfChart() {
-  const snap = await getDocs(query(collection(db,'tests'), where('studentId','==',session.userId)));
-  const tests = snap.docs.map(d => d.data());
-  const daily = tests.filter(t=>t.type==='daily'), monthly = tests.filter(t=>t.type==='monthly'), final = tests.filter(t=>t.type==='final');
-  const avg = arr => arr.length ? parseFloat((arr.reduce((s,t)=>s+(t.marks/t.total)*100,0)/arr.length).toFixed(1)) : 0;
-  if (chartPerf) chartPerf.destroy();
+function renderStudentPerfChart(atts, attempts) {
+  const avg = arr => arr.length ? parseFloat((arr.reduce((s,a)=>s+(a.score||0)/(a.total||1)*100,0)/arr.length).toFixed(1)) : 0;
+  const daily=attempts.filter(a=>a.type==='daily'||a.testType==='daily');
+  const monthly=attempts.filter(a=>a.type==='monthly'||a.testType==='monthly');
+  const final=attempts.filter(a=>a.type==='final'||a.testType==='final');
+  const pct=atts.length?Math.round(atts.filter(a=>a.status==='present').length/atts.length*100):0;
+
+  if(chartPerfS) chartPerfS.destroy();
   const ctx = document.getElementById('chartPerf').getContext('2d');
-  chartPerf = new Chart(ctx, {type:'radar',data:{labels:['Daily Tests','Monthly Tests','Final Exam','Attendance'],datasets:[{label:'My Performance',data:[avg(daily),avg(monthly),avg(final),parseFloat(document.getElementById('dAtt').textContent)||0],backgroundColor:'rgba(167,139,250,0.15)',borderColor:'#a78bfa',borderWidth:2,pointBackgroundColor:'#a78bfa',pointRadius:4}]},options:{responsive:true,scales:{r:{ticks:{color:'#3730a3',backdropColor:'transparent'},grid:{color:'rgba(167,139,250,0.12)'},pointLabels:{color:'#64748b',font:{size:11}},min:0,max:100}},plugins:{legend:{display:false}}}});
-}
-
-// ── JOIN COURSE ───────────────────────────────────────────────
-window.joinCourse = async () => {
-  const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-  if (code.length !== 6) return toast('Enter a valid 6-character code','error');
-  await doJoin(code, 'joinResult');
-};
-window.joinCourse2 = async () => {
-  const code = document.getElementById('joinCode2').value.trim().toUpperCase();
-  if (code.length !== 6) return toast('Enter a valid 6-character code','error');
-  await doJoin(code, null);
-};
-
-async function doJoin(code, resultElId) {
-  const snap = await getDocs(query(collection(db,'courses'), where('joinCode','==',code)));
-  const resultEl = resultElId ? document.getElementById(resultElId) : null;
-  if (snap.empty) {
-    if (resultEl) { resultEl.innerHTML = '<p class="text-red-400 text-xs">❌ Invalid join code. Check with your teacher.</p>'; resultEl.classList.remove('hidden'); }
-    else toast('Invalid join code','error'); return;
-  }
-  const course = {id:snap.docs[0].id,...snap.docs[0].data()};
-  // Check duplicate
-  const ex = myEnrollments.find(e => e.courseId === course.id);
-  if (ex) {
-    if (resultEl) { resultEl.innerHTML = `<p class="text-yellow-400 text-xs">⚠️ Already enrolled in <strong>${course.name}</strong></p>`; resultEl.classList.remove('hidden'); }
-    else toast('Already enrolled in this course','error'); return;
-  }
-  // Enroll
-  await addDoc(collection(db,'enrollments'), {
-    studentId:session.userId, studentName:session.name, courseId:course.id, courseName:course.name,
-    teacherId:course.teacherId, teacherName:course.teacherName||'', joinCode:code, enrolledAt:serverTimestamp()
+  chartPerfS = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Daily Tests','Monthly','Final Exam','Attendance'],
+      datasets:[{
+        data:[avg(daily),avg(monthly),avg(final),pct],
+        backgroundColor:['rgba(56,189,248,0.65)','rgba(167,139,250,0.65)','rgba(244,114,182,0.65)','rgba(52,211,153,0.65)'],
+        borderRadius:6,borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,animation:{duration:700},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},
+      scales:{
+        x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'},min:0,max:100}
+      }
+    }
   });
-  if (resultEl) { resultEl.innerHTML = `<p class="text-green-400 text-xs">✅ Successfully enrolled in <strong>${course.name}</strong>!</p>`; resultEl.classList.remove('hidden'); }
-  toast('Enrolled in ' + course.name + '!','success');
-  await loadMyEnrollments();
 }
+
+function renderAttChart(atts) {
+  // Group attendance by course
+  const byCourse = {};
+  atts.forEach(a=>{
+    const key = a.courseName||a.courseId||'Other';
+    if(!byCourse[key]) byCourse[key]={p:0,t:0};
+    byCourse[key].t++;
+    if(a.status==='present') byCourse[key].p++;
+  });
+  const labels = Object.keys(byCourse).map(k=>k.length>10?k.slice(0,10)+'…':k);
+  const pcts = Object.values(byCourse).map(v=>v.t?Math.round(v.p/v.t*100):0);
+
+  if(chartAttS) chartAttS.destroy();
+  const ctx = document.getElementById('chartAtt').getContext('2d');
+  if(!labels.length) {
+    chartAttS = new Chart(ctx, {type:'doughnut',data:{labels:['No Data'],datasets:[{data:[1],backgroundColor:['rgba(100,116,139,0.3)'],borderWidth:0}]},options:{plugins:{legend:{display:false}},responsive:true}});
+    return;
+  }
+  chartAttS = new Chart(ctx, {
+    type:'doughnut',
+    data:{
+      labels:[...labels,'Absent'],
+      datasets:[{
+        data:[...pcts, 100-Math.round(atts.filter(a=>a.status==='present').length/(atts.length||1)*100)],
+        backgroundColor:[...pcts.map((_,i)=>`hsl(${250+i*30},70%,60%)`), 'rgba(248,113,113,0.5)'],
+        borderWidth:1,borderColor:'rgba(255,255,255,0.04)',hoverOffset:5
+      }]
+    },
+    options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#64748b',font:{size:9},padding:6}}}}
+  });
+}
+
+function renderDashCourseList() {
+  const el = document.getElementById('dashCourseList');
+  if(!el) return;
+  if(!myCourseDocs.length){ el.innerHTML='<p class="text-slate-600 text-xs text-center py-3">No enrolled courses yet</p>'; return; }
+  el.innerHTML = myCourseDocs.slice(0,4).map(c=>`
+    <div class="flex items-center gap-2 p-2.5 rounded-xl cursor-pointer hover:bg-violet-400/5 transition-colors" style="border:1px solid rgba(167,139,250,0.1)" onclick="showSec('courses')">
+      <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm" style="background:rgba(167,139,250,0.15)">📚</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-white text-xs font-semibold truncate">${c.name}</p>
+        <p class="text-slate-600 text-xs">${c.teacherName||'Vision IT'}</p>
+      </div>
+    </div>`).join('');
+}
+
+
+
+// ── JOIN COURSE (DISABLED - Admin controls enrollment) ────────
+window.joinCourse = () => { toast('Direct enrollment is disabled. Please send an Admission Inquiry.','error'); showSec('explore'); };
+window.joinCourse2 = () => { toast('Direct enrollment is disabled. Please send an Admission Inquiry.','error'); showSec('explore'); };
+window.showJoinForCourse = (courseId, courseName) => { openAdmissionQueryForm(courseId); };
+window.joinWithModalCode = () => { toast('Direct enrollment is disabled. Please contact admin.','error'); };
+async function doJoin() { toast('Enrollment is managed by admin only.','error'); }
 
 // ── CURRICULUM (Student Read-Only View) ──────────────────────
 async function initStudentCurriculum() {
   const sel = document.getElementById('sCurCourse');
   sel.innerHTML = '<option value="">Select Course</option>';
-  // Populate from enrolled courses
-  if (enrolledCourses && enrolledCourses.length) {
-    enrolledCourses.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+  // Use enrolledCourses (populated from loadMyEnrollments) or myCourseDocs
+  const courses = enrolledCourses.length ? enrolledCourses : myCourseDocs.map(c=>({id:c.id,name:c.name}));
+  if (courses.length) {
+    courses.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
   } else {
+    // Last fallback: fetch directly
     const snap = await getDocs(query(collection(db,'enrollments'),where('studentId','==',session.userId)));
     snap.docs.forEach(d => { const e=d.data(); sel.innerHTML += `<option value="${e.courseId}">${e.courseName}</option>`; });
   }
@@ -1085,112 +1320,86 @@ window.loadStudentCurriculum = async () => {
   const emptyEl = document.getElementById('sCurEmpty');
   summary.classList.add('hidden'); unitsEl.innerHTML = ''; emptyEl.style.display='block';
   if (!courseId) return;
-
   emptyEl.innerHTML = '<div class="text-3xl mb-2">⏳</div><p>Loading...</p>';
 
-  const cSnap = await getDocs(query(collection(db,'curriculum'),where('courseId','==',courseId)));
-  if (cSnap.empty) {
-    emptyEl.innerHTML = '<div class="text-4xl mb-3">📋</div><p class="text-slate-500">Curriculum not set up yet for this course.</p>';
-    return;
-  }
+  try {
+    // New structure: modules (curriculumUnits by courseId), titles (curriculumLessons), sub-topics (curriculumSubTopics)
+    const [mSnap, tSnap, stSnap] = await Promise.all([
+      getDocs(query(collection(db,'curriculumUnits'), where('courseId','==',courseId))),
+      getDocs(query(collection(db,'curriculumLessons'), where('courseId','==',courseId))),
+      getDocs(query(collection(db,'curriculumSubTopics'), where('courseId','==',courseId)))
+    ]);
 
-  const cur = {id: cSnap.docs[0].id, ...cSnap.docs[0].data()};
-  emptyEl.style.display = 'none';
+    const modules = mSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+    const titles = tSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+    const subTopics = stSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
 
-  // Fill summary
-  document.getElementById('sCurTitle').textContent = cur.title || '';
-  document.getElementById('sCurMeta').textContent = [cur.subject, cur.level, cur.totalDuration, cur.board].filter(Boolean).join(' · ');
+    if (!modules.length) {
+      emptyEl.innerHTML = '<div class="text-4xl mb-3">📋</div><p class="text-slate-500">Curriculum not available yet for this course.</p>';
+      return;
+    }
 
-  // Objectives
-  if (cur.objectives && cur.objectives.length) {
-    document.getElementById('sCurObjectives').classList.remove('hidden');
-    document.getElementById('sCurObjList').innerHTML = cur.objectives.map(o => `<li class="flex items-start gap-2 text-xs text-slate-400"><span class="text-violet-400 mt-0.5">✦</span>${o}</li>`).join('');
-  }
+    emptyEl.style.display = 'none';
+    summary.classList.remove('hidden');
 
-  summary.classList.remove('hidden');
+    const doneTitles = titles.filter(t=>t.status==='done').length;
+    const pct = titles.length ? Math.round(doneTitles/titles.length*100) : 0;
+    document.getElementById('sCurBigPct').textContent = pct + '%';
+    document.getElementById('sCurProgBar').style.width = pct + '%';
+    document.getElementById('sCurProgLabel').textContent = `${doneTitles} of ${titles.length} titles completed`;
+    document.getElementById('sCurStatU').textContent = modules.length;
+    document.getElementById('sCurStatL').textContent = titles.length;
+    document.getElementById('sCurStatD').textContent = doneTitles;
 
-  // Load units and lessons
-  const uSnap = await getDocs(query(collection(db,'curriculumUnits'),where('curriculumId','==',cur.id)));
-  const units = uSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+    unitsEl.innerHTML = '';
+    modules.forEach(mod => {
+      const modTitles = titles.filter(t=>t.moduleId===mod.id);
+      const done = modTitles.filter(t=>t.status==='done').length;
+      const modPct = modTitles.length ? Math.round(done/modTitles.length*100) : 0;
 
-  let totalLessons=0, doneLessons=0;
-  unitsEl.innerHTML = '';
-
-  for (const unit of units) {
-    const lSnap = await getDocs(query(collection(db,'curriculumLessons'),where('unitId','==',unit.id)));
-    const lessons = lSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
-    totalLessons += lessons.length;
-    doneLessons += lessons.filter(l=>l.status==='done').length;
-    unitsEl.appendChild(buildStudentUnitCard(unit, lessons));
-  }
-
-  // Update stats
-  const pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
-  document.getElementById('sCurBigPct').textContent = pct + '%';
-  document.getElementById('sCurProgBar').style.width = pct + '%';
-  document.getElementById('sCurProgLabel').textContent = `${doneLessons} of ${totalLessons} lessons completed`;
-  document.getElementById('sCurStatU').textContent = units.length;
-  document.getElementById('sCurStatL').textContent = totalLessons;
-  document.getElementById('sCurStatD').textContent = doneLessons;
-};
-
-function buildStudentUnitCard(unit, lessons) {
-  const done = lessons.filter(l=>l.status==='done').length;
-  const pct = lessons.length ? Math.round(done/lessons.length*100) : 0;
-  const r=22, circ=2*Math.PI*r, offset=circ-(pct/100)*circ;
-
-  const div = document.createElement('div');
-  div.className = 'scur-unit';
-  div.innerHTML = `
-    <div class="scur-unit-hdr" onclick="toggleStudentUnit('${unit.id}')">
-      <div class="progress-ring-wrap">
-        <svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg)">
-          <circle fill="none" stroke="rgba(167,139,250,0.12)" stroke-width="4" cx="26" cy="26" r="${r}"/>
-          <circle fill="none" stroke="#a78bfa" stroke-width="4" stroke-linecap="round" cx="26" cy="26" r="${r}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/>
-        </svg>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#a78bfa;">${pct}%</div>
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
-          <span class="text-slate-500 text-xs font-bold mono">Unit ${unit.order||''}</span>
-          ${unit.duration ? `<span class="text-slate-600 text-xs">· ${unit.duration}</span>` : ''}
+      const div = document.createElement('div');
+      div.className = 'scur-unit';
+      div.innerHTML = `
+        <div class="scur-unit-hdr" onclick="toggleStudentUnit('${mod.id}')">
+          <div style="min-width:44px;min-height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(167,139,250,0.1);border:2px solid rgba(167,139,250,${modPct===100?'0.7':'0.2'});font-size:0.65rem;font-weight:700;color:#a78bfa;">${modPct}%</div>
+          <div class="flex-1 min-w-0">
+            <span class="text-slate-500 text-xs font-bold mono">Module ${mod.order||''}</span>
+            <h4 class="text-white font-bold text-sm mt-0.5">${mod.title}</h4>
+            <p class="text-slate-500 text-xs">${modTitles.length} titles · ${done} done</p>
+          </div>
+          <span class="text-slate-500 transition-transform" id="suarrow-${mod.id}">▼</span>
         </div>
-        <h4 class="text-white font-bold text-sm mt-0.5">${unit.title}</h4>
-        <p class="text-slate-500 text-xs">${lessons.length} lessons · ${done} completed</p>
-      </div>
-      <span class="text-slate-500 transition-transform" id="suarrow-${unit.id}">▼</span>
-    </div>
-    <div id="sUnitBody-${unit.id}" class="hidden">
-      ${lessons.length
-        ? lessons.map(l => buildStudentLessonRow(l)).join('')
-        : '<div class="p-4 text-center text-slate-600 text-xs">No lessons added yet</div>'}
-    </div>`;
-  return div;
-}
-
-function buildStudentLessonRow(l) {
-  const dotClass = {planned:'sl-planned', ongoing:'sl-ongoing', done:'sl-done'}[l.status]||'sl-planned';
-  const statusBg = l.status==='done' ? 'rgba(74,222,128,0.06)' : l.status==='ongoing' ? 'rgba(251,191,36,0.05)' : 'transparent';
-  return `<div class="scur-lesson" style="background:${statusBg}">
-    <div class="sl-dot ${dotClass} flex-shrink-0 mt-0.5"></div>
-    <div class="flex-1 min-w-0">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-slate-500 text-xs mono">L${l.order||''}</span>
-        <p class="text-sm ${l.status==='done'?'text-slate-400 line-through':'text-slate-200'} font-medium">${l.title}</p>
-        ${l.type ? `<span class="text-xs px-1.5 py-0.5 rounded" style="background:rgba(167,139,250,0.1);color:#c4b5fd">${l.type}</span>` : ''}
-        ${l.duration ? `<span class="text-slate-600 text-xs">⏱ ${l.duration}</span>` : ''}
-        ${l.scheduledDate ? `<span class="text-slate-600 text-xs">📅 ${l.scheduledDate}</span>` : ''}
-      </div>
-      ${l.description ? `<p class="text-slate-500 text-xs mt-0.5 leading-relaxed">${l.description}</p>` : ''}
-      <!-- Resource quick-access chips -->
-      <div class="flex flex-wrap gap-1.5 mt-1.5">
-        ${l.youtubeUrl ? `<span class="res-chip rc-yt" onclick="openLessonVideo('${l.youtubeUrl.replace(/'/g,"\\'")}','${l.title.replace(/'/g,"\\'")}')">▶ Watch Video</span>` : ''}
-        ${l.playlistId ? `<span class="res-chip rc-mat" onclick="openLessonPlaylist('${l.playlistId}')">🎬 Open Playlist</span>` : ''}
-      </div>
-    </div>
-    <span class="text-xs flex-shrink-0 px-2 py-1 rounded-full font-semibold ${l.status==='done'?'text-green-400':l.status==='ongoing'?'text-yellow-400':'text-slate-500'}" style="background:rgba(255,255,255,0.04)">${l.status==='done'?'✓ Done':l.status==='ongoing'?'● Ongoing':'Planned'}</span>
-  </div>`;
-}
+        <div id="sUnitBody-${mod.id}" class="hidden pb-2">
+          ${modTitles.length
+            ? modTitles.map(t => {
+                const subs = subTopics.filter(s=>s.titleId===t.id);
+                const statusColor = {planned:'text-slate-600',ongoing:'text-yellow-400',done:'text-emerald-400'}[t.status]||'text-slate-600';
+                const statusIcon = {planned:'○',ongoing:'●',done:'✓'}[t.status]||'○';
+                return `<div style="border-left:2px solid rgba(167,139,250,0.12);margin-left:1.5rem;padding-left:1rem;margin-bottom:0.5rem">
+                  <div class="flex items-start gap-2 py-2">
+                    <span class="${statusColor} text-sm font-bold flex-shrink-0 w-4">${statusIcon}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-slate-200 text-sm font-semibold">${t.title}</p>
+                      ${t.notes ? `<p class="text-slate-500 text-xs mt-0.5">${t.notes}</p>` : ''}
+                      ${t.scheduledDate ? `<p class="text-slate-600 text-xs">📅 ${t.scheduledDate}</p>` : ''}
+                      ${subs.length ? `<div class="mt-2 space-y-1">
+                        ${subs.map(s=>`<div class="flex items-center gap-2 px-2 py-1 rounded" style="background:rgba(255,255,255,0.02)">
+                          <span class="text-slate-600 text-xs">↳</span>
+                          <span class="text-slate-400 text-xs">${s.title}</span>
+                          ${s.notes ? `<span class="text-slate-600 text-xs">· ${s.notes}</span>` : ''}
+                        </div>`).join('')}
+                      </div>` : ''}
+                    </div>
+                  </div>
+                </div>`;
+              }).join('')
+            : `<p class="text-slate-600 text-xs text-center py-3 ml-6">No titles in this module yet.</p>`
+          }
+        </div>`;
+      unitsEl.appendChild(div);
+    });
+  } catch(e) { console.error(e); emptyEl.innerHTML = '<p class="text-red-400">Error loading curriculum</p>'; }
+};
 
 window.toggleStudentUnit = (unitId) => {
   const body = document.getElementById('sUnitBody-'+unitId);
@@ -1564,7 +1773,7 @@ window.loadMyResults = async () => {
   if (courseId) await loadMyRank(courseId);
 
   // Push to notify dashboard
-  renderPerfChart();
+  renderStudentPerfChart();
 };
 
 async function loadMyRank(courseId) {
@@ -2369,10 +2578,10 @@ window.loadStudentBatches = async () => {
           <div class="text-slate-600 text-xs">Timing</div>
         </div>
       </div>
-      <div class="text-xs text-slate-500 flex flex-wrap gap-2">
-        ${b.startDate?`<span>📅 ${b.startDate}</span>`:''}
-        ${b.schedule?`<span>📆 ${b.schedule}</span>`:''}
-        ${b.room?`<span>🏛 ${b.room}</span>`:''}
+      <div class="text-xs flex flex-wrap gap-1 mt-1">
+        ${(()=>{const days=b.weekDays||{};const keys=['mon','tue','wed','thu','fri','sat','sun'];const active=keys.filter(d=>days[d]);return active.length?active.map(d=>`<span class="px-1.5 py-0.5 rounded font-semibold" style="background:rgba(139,92,246,0.12);color:#a78bfa">${d.charAt(0).toUpperCase()+d.slice(1)}</span>`).join(''):'';})()}
+        ${b.timeFrom&&b.timeTo?`<span class="text-slate-500 ml-1">⏰ ${b.timeFrom} – ${b.timeTo}</span>`:''}
+        ${b.room?`<span class="text-slate-600">🏛 ${b.room}</span>`:''}
       </div>
     </div>`).join('');
 };
@@ -2390,10 +2599,8 @@ window.openStudentBatchDetail = async (bId) => {
   document.getElementById('studentBatchTab-info').innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-3">
-        ${b.startDate?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Start Date</span><span class="text-white text-xs font-semibold">${b.startDate}</span></div>`:''}
-        ${b.endDate?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">End Date</span><span class="text-white text-xs font-semibold">${b.endDate}</span></div>`:''}
-        ${b.timing?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Timing</span><span class="text-white text-xs font-semibold">${b.timing}</span></div>`:''}
-        ${b.schedule?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Schedule</span><span class="text-white text-xs font-semibold">${b.schedule}</span></div>`:''}
+        ${(()=>{const days=b.weekDays||{};const keys=['mon','tue','wed','thu','fri','sat','sun'];const active=keys.filter(d=>days[d]);if(!active.length)return'';const chips=active.map(d=>`<span class="px-2 py-0.5 rounded-lg text-xs font-bold" style="background:rgba(139,92,246,0.15);color:#a78bfa">${d.charAt(0).toUpperCase()+d.slice(1)}</span>`).join(' ');return `<div class="p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><p class="text-slate-500 text-xs mb-2">📅 Class Days</p><div class="flex flex-wrap gap-1">${chips}</div></div>`;})()}
+        ${b.timeFrom&&b.timeTo?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">⏰ Class Timing</span><span class="text-white text-xs font-semibold">${b.timeFrom} – ${b.timeTo}</span></div>`:''}
         ${b.room?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Room/Platform</span><span class="text-white text-xs font-semibold">${b.room}</span></div>`:''}
         ${b.teacherName?`<div class="flex justify-between p-3 rounded-xl bg-violet-400/5 border border-violet-400/10"><span class="text-slate-500 text-xs">Teacher</span><span class="text-violet-400 text-xs font-semibold">${b.teacherName}</span></div>`:''}
       </div>
@@ -2524,7 +2731,7 @@ async function loadMyFees() {
               <h4 class="text-white font-bold text-sm">${c.name||'Course'}</h4>
               <span class="badge border text-xs ${statusBadge}">${feeStatus}</span>
             </div>
-            <p class="text-slate-500 text-xs">${c.subject||''}</p>
+            <p class="text-slate-500 text-xs">${c.description||c.subject||''}</p>
           </div>
           <div class="text-right">
             <p class="text-white font-bold text-lg">₹${entry.netFee.toLocaleString('en-IN')}</p>
@@ -2628,8 +2835,493 @@ window.toast = (msg, type='info') => {
   setTimeout(() => el.remove(), 3200);
 };
 
+// ══════════════════════════════════════════════════════════
+// EXPLORE COURSES + ADMISSION QUERY  (Student Panel)
+// ══════════════════════════════════════════════════════════
+
+let allExploreCourses = [], exploreFiltered = [], exploreCatFilter = '', exploreFeeFilter = '';
+let myFreePermissions = new Set(); // courseIds where admin allowed self-enroll
+
+
+// ── SPECIAL OFFERS ────────────────────────────────────────────
+async function loadSpecialOffers() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const snap = await getDocs(query(
+      collection(db,'specialOffers'),
+      where('studentId','==',session.userId),
+      where('status','==','pending')
+    ));
+    const offers = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o => o.validUntil >= today); // exclude expired
+
+    const box = document.getElementById('specialOffersBox');
+    const list = document.getElementById('specialOffersList');
+    const badge = document.getElementById('offerCountBadge');
+
+    if(!offers.length){ box?.classList.add('hidden'); return; }
+
+    box?.classList.remove('hidden');
+    if(badge) badge.textContent = offers.length;
+
+    list.innerHTML = offers.map(o => {
+      const daysLeft = Math.ceil((new Date(o.validUntil) - new Date()) / 86400000);
+      return `<div class="p-3 rounded-xl" style="background:rgba(0,0,0,0.3);border:1px solid rgba(251,191,36,0.15)">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-xs font-bold">${o.courseName}</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-slate-500 line-through text-xs">₹${(o.originalFee||0).toLocaleString('en-IN')}</span>
+              <span class="text-yellow-400 font-bold text-sm">${o.finalFee===0?'🎁 FREE':'₹'+o.finalFee.toLocaleString('en-IN')}</span>
+              <span class="text-emerald-400 text-xs">(Save ₹${(o.originalFee-o.finalFee).toLocaleString('en-IN')})</span>
+            </div>
+            <p class="text-slate-400 text-xs italic mt-1">"${o.message}"</p>
+            <p class="text-${daysLeft<=2?'red':'yellow'}-400 text-xs mt-1">⏰ ${daysLeft} day${daysLeft!==1?'s':''} left · Expires ${o.validUntil}</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="acceptSpecialOffer('${o.id}','${o.courseId}','${o.courseName.replace(/'/g,"\\'")}','${o.finalFee}')" class="btn flex-1 justify-center text-xs font-bold" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000">✅ Accept Offer</button>
+          <button onclick="declineSpecialOffer('${o.id}')" class="btn bd text-xs">Decline</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.error('Offers load error:', e); }
+}
+
+window.acceptSpecialOffer = async (offerId, courseId, courseName, finalFee) => {
+  const feeNum = parseFloat(finalFee)||0;
+  const confirmMsg = feeNum === 0
+    ? `✅ "${courseName}" mein FREE enroll ho jaoge!\n\nAccept karein?`
+    : `✅ "${courseName}" mein ₹${feeNum.toLocaleString('en-IN')} mein enroll ho jaoge!\n\nAccept karein?`;
+  if(!confirm(confirmMsg)) return;
+
+  try {
+    // Get offer details
+    const offerDoc = await getDoc(doc(db,'specialOffers',offerId));
+    if(!offerDoc.exists()){ toast('Offer not found','error'); return; }
+    const offer = offerDoc.data();
+
+    // Check not already enrolled
+    const exEnroll = myEnrollments.find(e=>e.courseId===courseId);
+    if(exEnroll){ toast('Already enrolled in this course!','info'); return; }
+
+    // Get course details
+    const cDoc = await getDoc(doc(db,'courses',courseId));
+    const course = cDoc.exists() ? cDoc.data() : {};
+
+    // Create enrollment
+    await addDoc(collection(db,'enrollments'),{
+      studentId: session.userId, studentName: session.name,
+      courseId, courseName,
+      teacherId: course.teacherId||'', teacherName: course.teacherName||'',
+      enrolledAt: serverTimestamp(), enrolledBy: 'student-offer',
+      offerId, offerFinalFee: offer.finalFee, type:'special-offer'
+    });
+
+    // Mark offer as accepted
+    await updateDoc(doc(db,'specialOffers',offerId),{status:'accepted', acceptedAt:serverTimestamp()});
+
+    await loadMyEnrollments();
+    await loadSpecialOffers();
+    toast(`🎉 Congratulations! "${courseName}" mein enroll ho gaye!`,'success');
+  } catch(e){ console.error(e); toast('Enrollment failed. Try again.','error'); }
+};
+
+window.declineSpecialOffer = async (offerId) => {
+  if(!confirm('Is offer ko decline karna chahte hain?')) return;
+  await updateDoc(doc(db,'specialOffers',offerId),{status:'declined', declinedAt:serverTimestamp()});
+  toast('Offer declined','info');
+  loadSpecialOffers();
+};
+
+// ── FREE SELF-ENROLL ──────────────────────────────────────────
+window.studentSelfEnroll = async (courseId, courseName, teacherId, teacherName, feeType) => {
+  if(!confirm(`"${courseName}" mein free enroll karna chahte hain?`)) return;
+  try {
+    // Check not already enrolled
+    const exSnap = await getDocs(query(collection(db,'enrollments'),where('studentId','==',session.userId),where('courseId','==',courseId)));
+    if(!exSnap.empty) { toast('Already enrolled!','info'); return; }
+    const enrollId = 'ENR' + Date.now();
+    await setDoc(doc(db,'enrollments',enrollId),{
+      enrollmentId:enrollId, studentId:session.userId, studentName:session.name,
+      courseId, courseName, teacherId:teacherId||'', teacherName:teacherName||'',
+      totalFee:0, paidFee:0, feeStatus:'paid', enrolledAt:serverTimestamp(),
+      source:'self_enroll_free', isActive:true
+    });
+    toast(`🎉 "${courseName}" mein enroll ho gaye!`,'success');
+    await loadMyEnrollments();
+    initExploreCourses();
+  } catch(e) { console.error(e); toast('Enrollment failed: '+e.message,'error'); }
+};
+
+// ── COURSE DATE HELPERS ───────────────────────────────────────
+function getCourseStatus(course) {
+  if (!course.startDate || !course.endDate) return 'active'; // no date = always show
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(course.startDate);
+  const end = new Date(course.endDate);
+  if (today < start) return 'upcoming';
+  if (today > end) return 'expired';
+  return 'active';
+}
+function getCourseStatusBadge(course) {
+  const s = getCourseStatus(course);
+  if (s==='upcoming') return `<span class="badge" style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);font-size:10px">🕐 Upcoming</span>`;
+  if (s==='expired')  return `<span class="badge" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);font-size:10px">⛔ Expired</span>`;
+  return `<span class="badge" style="background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25);font-size:10px">✅ Active</span>`;
+}
+
+window.initExploreCourses = async () => {
+  document.getElementById('exploreGrid').innerHTML = '<div class="gc p-8 text-center text-slate-600 col-span-full">Loading courses...</div>';
+  try {
+    const [snap, permSnap] = await Promise.all([
+      getDocs(collection(db,'courses')),
+      getDocs(query(collection(db,'freeEnrollPermissions'), where('studentId','==',session.userId)))
+    ]);
+    allExploreCourses = snap.docs.map(d=>({id:d.id,...d.data()}));
+    myFreePermissions = new Set(permSnap.docs.map(d=>d.data().courseId));
+
+    // Filter: hide expired courses from students
+    const visibleCourses = allExploreCourses.filter(c => getCourseStatus(c) !== 'expired');
+
+    // Stats (based on visible only)
+    document.getElementById('expTotalCourses').textContent = visibleCourses.length;
+    document.getElementById('expFreeCourses').textContent = visibleCourses.filter(c=>!(c.fees>0)).length;
+    const uniqueTeachers = new Set(visibleCourses.map(c=>c.teacherId).filter(Boolean));
+    document.getElementById('expTeachers').textContent = uniqueTeachers.size;
+
+    // Category pills + dropdown
+    const categories = [...new Set(allExploreCourses.map(c=>c.category).filter(Boolean))];
+    const subjects = [...new Set(allExploreCourses.map(c=>(c.subject||'').split(',')[0].trim()).filter(Boolean))];
+    const pills = ['All', ...categories, ...subjects.filter(s=>!categories.includes(s))].slice(0,15);
+
+    const pillsEl = document.getElementById('explorePills');
+    pillsEl.innerHTML = pills.map((s,i)=>{
+      const val = i===0?'':s;
+      return `<button onclick="filterExploreCoursesBySubject('${val}')" id="pill-${CSS.escape(s)}" 
+        class="badge ${i===0?'bp':'bv2'}" style="cursor:pointer;padding:4px 12px;font-size:11px">${s}</button>`;
+    }).join('');
+
+    // Populate category dropdown
+    const catSel = document.getElementById('exploreCatFilter');
+    if(catSel){
+      catSel.innerHTML = `<option value="">📂 All Categories</option>` 
+        + categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+
+    renderExploreGrid(visibleCourses);
+    loadMyQueries();
+  } catch(e){ console.error(e); document.getElementById('exploreGrid').innerHTML = '<div class="gc p-8 text-center text-red-400 col-span-full">Error loading courses</div>'; }
+};
+
+window.filterExploreCourses = () => {
+  const q = (document.getElementById('exploreSearch')?.value||'').toLowerCase();
+  exploreFeeFilter = document.getElementById('exploreFeeFilter')?.value||'';
+  const catDrop = document.getElementById('exploreCatFilter')?.value||'';
+  let filtered = allExploreCourses.filter(c => getCourseStatus(c) !== 'expired');
+  // Category from pill or dropdown
+  const activeCat = exploreCatFilter || catDrop;
+  if(activeCat) filtered = filtered.filter(c=>(c.category||'')=== activeCat || (c.subject||'').toLowerCase().includes(activeCat.toLowerCase()));
+  if(exploreFeeFilter==='free') filtered = filtered.filter(c=>!(c.fees>0));
+  if(exploreFeeFilter==='paid') filtered = filtered.filter(c=>c.fees>0);
+  if(q) filtered = filtered.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.description||c.subject||'').toLowerCase().includes(q)||(c.category||'').toLowerCase().includes(q)||(c.teacherName||'').toLowerCase().includes(q)||(c.features||'').toLowerCase().includes(q));
+  renderExploreGrid(filtered);
+};
+
+window.filterExploreCoursesBySubject = (subject) => {
+  exploreCatFilter = subject;
+  document.querySelectorAll('#explorePills button').forEach(b=>{ b.className='badge bv2'; b.style.cssText='cursor:pointer;padding:4px 12px;font-size:11px'; });
+  const activeKey = subject||'All';
+  const active = document.getElementById('pill-'+CSS.escape(activeKey));
+  if(active){ active.className='badge bp'; active.style.cssText='cursor:pointer;padding:4px 12px;font-size:11px'; }
+  filterExploreCourses();
+};
+
+function renderExploreGrid(courses) {
+  const grid = document.getElementById('exploreGrid');
+  if (!courses.length){ grid.innerHTML='<div class="gc p-8 text-center text-slate-600 col-span-full">No courses found</div>'; return; }
+  const enrolledIds = new Set(myEnrollments.map(e=>e.courseId));
+  grid.innerHTML = courses.map(c=>{
+    const isFree = !(c.fees>0);
+    const fee = c.netFee||c.fees||0;
+    const discAmt = c.discountAmt||c.discountAmount||0;
+    const isEnrolled = enrolledIds.has(c.id);
+    const courseStatus = getCourseStatus(c);
+    const isUpcoming = courseStatus === 'upcoming';
+    const canSelfEnroll = !isUpcoming && isFree && c.selfEnrollEnabled && myFreePermissions.has(c.id) && !isEnrolled;
+    const subjects = (c.features||c.subject||'').split(',').map(s=>s.trim()).filter(Boolean);
+    let dateInfo = '';
+    if (c.startDate && c.endDate) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const start = new Date(c.startDate); const end = new Date(c.endDate);
+      if (today < start) {
+        const dl = Math.ceil((start-today)/86400000);
+        dateInfo = `<p class="text-yellow-400 text-xs mb-1">🕐 Starts in ${dl} day${dl!==1?'s':''} · ${c.startDate}</p>`;
+      } else {
+        const rem = Math.ceil((end-today)/86400000);
+        dateInfo = `<p class="text-emerald-400 text-xs mb-1">✅ Ends in ${rem} day${rem!==1?'s':''} · ${c.endDate}</p>`;
+      }
+    }
+    return `<div class="gc overflow-hidden hover:border-violet-400/30 transition-all${isUpcoming?' opacity-80':''}" style="display:flex;flex-direction:column">
+      ${c.bannerUrl ? `<img src="${c.bannerUrl}" class="w-full h-32 object-cover"/>` : `<div class="w-full h-32 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(251,113,133,0.1))"><span class="text-4xl">${isUpcoming?'🕐':'📚'}</span></div>`}
+      <div class="p-4 flex flex-col flex-1">
+        <div class="flex items-start justify-between gap-2 mb-1">
+          <h4 class="font-bold text-white text-sm">${c.name}</h4>
+          <span class="badge ${isFree?'ba':'bv2'} text-xs flex-shrink-0">${isFree?'🟢 Free':'💰 Paid'}</span>
+        </div>
+        ${c.category ? `<span class="text-xs text-slate-500 mb-1">📂 ${c.category}</span>` : ''}
+        <div class="flex flex-wrap gap-1 mb-1">${subjects.map(s=>`<span class="badge bv2" style="font-size:10px">${s}</span>`).join('')}</div>
+        <p class="text-slate-500 text-xs mb-1">👨‍🏫 ${c.teacherName||'—'}</p>
+        ${dateInfo}
+        <div class="mt-auto pt-3 border-t border-violet-400/10">
+          <div class="flex items-center justify-between mb-3">
+            ${!isFree ? `<div>
+              <span class="text-violet-400 font-bold text-base">₹${fee.toLocaleString('en-IN')}</span>
+              ${discAmt>0 ? `<span class="text-slate-600 line-through text-xs ml-1">₹${(c.fees||0).toLocaleString('en-IN')}</span>` : ''}
+              ${discAmt>0 ? `<span class="badge bw2 text-xs ml-1">🏷 ${c.discountType==='percent'?c.discountAmount+'% off':'₹'+discAmt+' off'}</span>` : ''}
+            </div>` : `<span class="badge ba text-xs">✓ Free</span>`}
+            ${isEnrolled && !isUpcoming ? '<span class="badge ba text-xs">✓ Enrolled</span>' : ''}
+            ${isUpcoming ? `<span class="badge" style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);font-size:10px">🕐 Coming Soon</span>` : ''}
+            ${!isUpcoming && isFree && !c.selfEnrollEnabled ? '<span class="badge bw2 text-xs">Admin Enrollment</span>' : ''}
+            ${!isUpcoming && isFree && c.selfEnrollEnabled && !myFreePermissions.has(c.id) && !isEnrolled ? '<span class="badge bw2 text-xs">Ask Admin to Allow</span>' : ''}
+          </div>
+          <div class="flex gap-2">
+            ${canSelfEnroll ? `<button onclick="studentSelfEnroll('${c.id}','${c.name.replace(/'/g,"\'")}','${c.teacherId||''}','${(c.teacherName||'').replace(/'/g,"\'")}','free')" class="btn ba flex-1 justify-center text-xs">🎓 Enroll Free</button>` : ''}
+            ${isEnrolled && !isUpcoming ? `<button onclick="showSec('courses')" class="btn ba flex-1 justify-center text-xs">📖 Open</button>` : ''}
+            ${isUpcoming && isEnrolled ? `<button class="btn flex-1 justify-center text-xs" style="background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)" disabled>⏳ Enrolled · Not Started</button>` : ''}
+            <button onclick="openAdmissionQueryForm('${c.id}')" class="btn bp flex-1 justify-center text-xs">📩 Inquiry</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+
+window.showJoinForCourse = (courseId, courseName) => { openAdmissionQueryForm(courseId); };
+window.joinWithModalCode = () => { toast('Direct enrollment is disabled. Please contact admin.','error'); };
+
+// ── ADMISSION QUERY ────────────────────────────────────────
+
+window.openAdmissionQueryForm = (preSelectedCourseId) => {
+  const courseOpts = allExploreCourses.map(c=>
+    `<option value="${c.id}" ${c.id===preSelectedCourseId?'selected':''}>${c.name}</option>`
+  ).join('');
+  showModal(`
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#a78bfa,#fb7185)"><span class="text-xl">📩</span></div>
+      <div><h3 class="text-lg font-display font-bold text-white">Admission Inquiry</h3><p class="text-slate-500 text-xs">We'll get back to you soon!</p></div>
+    </div>
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="lbl">Full Name *</label><input id="aqName" class="inp" value="${session.name||''}" placeholder="Your full name"/></div>
+        <div><label class="lbl">Phone *</label><input id="aqPhone" class="inp" type="tel" value="${session.phone||''}" placeholder="Mobile number"/></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="lbl">Email</label><input id="aqEmail" class="inp" type="email" placeholder="email@example.com"/></div>
+        <div><label class="lbl">Interested Course</label>
+          <select id="aqCourse" class="inp"><option value="">-- Select Course --</option>${courseOpts}</select></div>
+      </div>
+      <div><label class="lbl">Qualification</label>
+        <select id="aqQual" class="inp">
+          <option value="">Select qualification</option>
+          <option>10th Pass</option><option>12th Pass</option><option>Graduate</option><option>Post Graduate</option><option>Other</option>
+        </select>
+      </div>
+      <div><label class="lbl">Message / Query *</label>
+        <textarea id="aqMsg" class="inp" rows="3" placeholder="Tell us about your interest, preferred timing, any questions..."></textarea></div>
+      <div><label class="lbl">How did you hear about us?</label>
+        <select id="aqSource" class="inp">
+          <option value="">Select source</option>
+          <option>Google Search</option><option>Social Media</option><option>Friend / Referral</option><option>Banner / Poster</option><option>Walk-in</option><option>Other</option>
+        </select></div>
+      <button onclick="submitAdmissionQuery()" class="btn bp w-full justify-center mt-2">📩 Submit Inquiry</button>
+    </div>`);
+};
+
+window.submitAdmissionQuery = async () => {
+  const name = document.getElementById('aqName').value.trim();
+  const phone = document.getElementById('aqPhone').value.trim();
+  const msg = document.getElementById('aqMsg').value.trim();
+  const courseId = document.getElementById('aqCourse').value;
+  const courseEl = document.getElementById('aqCourse');
+  const courseName = courseId ? courseEl.options[courseEl.selectedIndex]?.text : '';
+  if(!name||!phone||!msg){ toast('Name, phone, message required','error'); return; }
+  try {
+    await addDoc(collection(db,'admissionQueries'),{
+      studentId: session.userId,
+      studentName: name,
+      phone,
+      email: document.getElementById('aqEmail').value.trim(),
+      courseId, courseName,
+      qualification: document.getElementById('aqQual').value,
+      message: msg,
+      source: document.getElementById('aqSource').value,
+      status: 'pending',
+      adminReply: '',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    closeModal();
+    toast('Inquiry submitted! We will contact you soon.','success');
+    loadMyQueries();
+  } catch(e){ console.error(e); toast('Error submitting inquiry','error'); }
+};
+
+window.loadMyQueries = async () => {
+  const el = document.getElementById('myQueriesList');
+  if(!el) return;
+  try {
+    const snap = await getDocs(query(collection(db,'admissionQueries'), where('studentId','==',session.userId), orderBy('createdAt','desc')));
+    if(!snap.size){ el.innerHTML='<div class="gc p-4 text-center text-slate-600 text-sm">No queries sent yet.</div>'; return; }
+    el.innerHTML = snap.docs.map(d=>{
+      const q = {id:d.id,...d.data()};
+      const date = q.createdAt?.toDate?.()?.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})||'-';
+      const statusColor = q.status==='resolved'?'ba':q.status==='replied'?'bp2':'bw2';
+      const statusIcon = q.status==='resolved'?'✅':q.status==='replied'?'💬':'⏳';
+      return `<div class="gc p-4">
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-xs font-semibold">${q.courseName||'General Inquiry'}</p>
+            <p class="text-slate-500 text-xs mt-0.5 line-clamp-2">${q.message}</p>
+          </div>
+          <div class="flex flex-col items-end gap-1 flex-shrink-0">
+            <span class="badge ${statusColor} text-xs">${statusIcon} ${q.status}</span>
+            <span class="text-slate-600 text-xs">${date}</span>
+          </div>
+        </div>
+        ${q.adminReply ? `<div class="mt-2 p-2.5 rounded-lg" style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2)">
+          <p class="text-violet-400 text-xs font-semibold mb-0.5">💬 Admin Reply:</p>
+          <p class="text-slate-300 text-xs">${q.adminReply}</p>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e){ el.innerHTML='<div class="gc p-4 text-center text-slate-600 text-sm">Could not load queries.</div>'; }
+};
+
 // Prevent right-click during exam
 document.addEventListener('contextmenu', e => { if (activeExam) e.preventDefault(); });
+
+// ══════════════════════════════════════════════════════════
+// MARKSHEET DOWNLOAD  (Student Panel)
+// ══════════════════════════════════════════════════════════
+
+window.studentDownloadMarksheet = async () => {
+  const courseId = document.getElementById('resultCourse').value;
+  if(!courseId){ toast('Select a course to download marksheet','error'); return; }
+  toast('Generating your marksheet...','info');
+  try {
+    // Student info
+    const uDoc = await getDoc(doc(db,'users',session.userId));
+    const u = uDoc.exists() ? uDoc.data() : {name:session.name,userId:session.userId};
+    // Course info
+    const cDoc = await getDoc(doc(db,'courses',courseId));
+    const courseObj = cDoc.exists() ? {id:courseId,...cDoc.data()} : {name:'My Course'};
+    // Tests
+    const tSnap = await getDocs(query(collection(db,'tests'),where('studentId','==',session.userId),where('courseId','==',courseId)));
+    const tests = tSnap.docs.map(d=>d.data());
+    // Online attempts
+    const aSnap = await getDocs(query(collection(db,'examAttempts'),where('studentId','==',session.userId),where('courseId','==',courseId)));
+    const attempts = aSnap.docs.map(d=>d.data());
+    // Attendance
+    const attSnap = await getDocs(query(collection(db,'attendance'),where('studentId','==',session.userId),where('courseId','==',courseId)));
+    const atts = attSnap.docs.map(d=>d.data());
+    // Rank
+    const rankSnap = await getDocs(query(collection(db,'tests'),where('courseId','==',courseId)));
+    const sMap = {};
+    rankSnap.docs.forEach(d=>{const t=d.data();if(!sMap[t.studentId])sMap[t.studentId]={m:0,mx:0};sMap[t.studentId].m+=t.marks||0;sMap[t.studentId].mx+=t.total||1;});
+    const sorted = Object.keys(sMap).sort((a,b)=>(sMap[b].m/sMap[b].mx)-(sMap[a].m/sMap[a].mx));
+    const rank = sorted.indexOf(session.userId)+1;
+    buildStudentMarksheetPDF(u, courseObj, tests, attempts, atts, rank, sorted.length);
+  } catch(e){ console.error(e); toast('Error generating marksheet','error'); }
+};
+
+function buildStudentMarksheetPDF(u, courseObj, tests, attempts, atts, rank, totalStudents) {
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,H=297;
+  pdf.setFillColor(2,8,23); pdf.rect(0,0,W,H,'F');
+  pdf.setFillColor(15,23,42); pdf.rect(0,0,W,42,'F');
+  // Violet accent line
+  pdf.setFillColor(167,139,250); pdf.rect(0,0,W,3,'F');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(167,139,250);
+  pdf.text('VISION IT COMPUTER INSTITUTE',W/2,14,{align:'center'});
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(100,116,139);
+  pdf.text('Empowering Digital Skills | www.visionit.in',W/2,20,{align:'center'});
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(255,255,255);
+  pdf.text('STUDENT MARKSHEET',W/2,30,{align:'center'});
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(100,116,139);
+  const now=new Date(); pdf.text('Generated: '+now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),W/2,37,{align:'center'});
+  let y=50;
+  pdf.setFillColor(15,23,42); pdf.setDrawColor(167,139,250,0.3); pdf.setLineWidth(0.3);
+  pdf.roundedRect(10,y,W-20,32,2,2,'FD');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(167,139,250);
+  pdf.text('STUDENT INFORMATION',14,y+7);
+  pdf.setDrawColor(167,139,250); pdf.line(14,y+9,80,y+9);
+  const iy=y+16;
+  pdf.setFontSize(8); pdf.setFont('helvetica','bold'); pdf.setTextColor(100,116,139);
+  pdf.text('NAME',14,iy); pdf.text('STUDENT ID',80,iy); pdf.text('COURSE',130,iy);
+  pdf.setFont('helvetica','normal'); pdf.setTextColor(226,232,240);
+  pdf.text((u.name||'-').substring(0,22),14,iy+6); pdf.text(u.userId||'-',80,iy+6); pdf.text((courseObj.name||'-').substring(0,20),130,iy+6);
+  const iy2=iy+14;
+  pdf.setFont('helvetica','bold'); pdf.setTextColor(100,116,139);
+  pdf.text('GUARDIAN',14,iy2); pdf.text('DOB',80,iy2); pdf.text('SESSION',130,iy2);
+  pdf.setFont('helvetica','normal'); pdf.setTextColor(226,232,240);
+  pdf.text((u.guardianName||u.fatherName||'-').substring(0,22),14,iy2+6); pdf.text(u.dob||'-',80,iy2+6); pdf.text(courseObj.duration||now.getFullYear().toString(),130,iy2+6);
+  y=92;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(167,139,250);
+  pdf.text('EXAMINATION RESULTS',14,y); y+=5;
+  pdf.setDrawColor(167,139,250); pdf.line(14,y,W-14,y); y+=4;
+  pdf.setFillColor(15,23,42); pdf.rect(10,y,W-20,8,'F');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor(167,139,250);
+  pdf.text('EXAM TYPE',14,y+5.5); pdf.text('SUBJECT / TITLE',54,y+5.5); pdf.text('MARKS',120,y+5.5,{align:'right'}); pdf.text('MAX',138,y+5.5,{align:'right'}); pdf.text('%',154,y+5.5,{align:'right'}); pdf.text('GRADE',175,y+5.5,{align:'right'});
+  y+=10;
+  const gG=p=>p>=90?'A+':p>=80?'A':p>=70?'B+':p>=60?'B':p>=50?'C':'F';
+  const gC=g=>g==='A+'||g==='A'?[110,231,183]:g==='B+'||g==='B'?[129,140,248]:g==='C'?[251,191,36]:[248,113,113];
+  const sections=[
+    {label:'Daily Tests',items:tests.filter(t=>t.type==='daily').map(t=>({title:t.subject||'Daily Test',marks:t.marks||0,total:t.total||10}))},
+    {label:'Monthly Tests',items:tests.filter(t=>t.type==='monthly').map(t=>({title:t.subject||'Monthly Test',marks:t.marks||0,total:t.total||50}))},
+    {label:'Final Exam',items:tests.filter(t=>t.type==='final').map(t=>({title:t.subject||'Final Exam',marks:t.marks||0,total:t.total||100}))},
+    {label:'Online Exams',items:attempts.map(a=>({title:a.examTitle||'Online Exam',marks:a.score||0,total:a.total||10}))},
+  ].filter(s=>s.items.length>0);
+  let gm=0,gmx=0;
+  const allRows=[];
+  sections.forEach(sec=>{
+    allRows.push({isHeader:true,label:sec.label});
+    sec.items.forEach(item=>{allRows.push({...item,type:sec.label});gm+=item.marks;gmx+=item.total;});
+    const sm=sec.items.reduce((s,i)=>s+i.marks,0),smx=sec.items.reduce((s,i)=>s+i.total,0);
+    allRows.push({isSubtotal:true,label:sec.label+' Average',marks:sm,total:smx,pct:smx?(sm/smx*100).toFixed(1):0});
+  });
+  if(!allRows.length){ allRows.push({isHeader:false,isSubtotal:false,type:'—',title:'No exam records found',marks:0,total:0}); }
+  allRows.forEach((row,idx)=>{
+    if(y>270){pdf.addPage();pdf.setFillColor(2,8,23);pdf.rect(0,0,W,H,'F');y=20;}
+    if(row.isHeader){pdf.setFillColor(20,30,50);pdf.rect(10,y-3,W-20,7,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(7.5);pdf.setTextColor(129,140,248);pdf.text('▸ '+row.label,14,y+1);y+=6;}
+    else if(row.isSubtotal){pdf.setFillColor(15,23,42);pdf.rect(10,y-3,W-20,7.5,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('Subtotal',14,y+1);pdf.text(row.marks.toString(),120,y+1,{align:'right'});pdf.text(row.total.toString(),138,y+1,{align:'right'});const g=gG(parseFloat(row.pct));const[r2,g2,b2]=gC(g);pdf.setTextColor(r2,g2,b2);pdf.text(row.pct+'%',154,y+1,{align:'right'});pdf.text(g,175,y+1,{align:'right'});y+=8;}
+    else{if(idx%2===0){pdf.setFillColor(8,15,30);pdf.rect(10,y-3.5,W-20,7,'F');}pdf.setFont('helvetica','normal');pdf.setFontSize(7.5);pdf.setTextColor(226,232,240);pdf.text((row.type||'').substring(0,14),14,y+0.5);pdf.text((row.title||'-').substring(0,28),54,y+0.5);pdf.text(row.marks.toString(),120,y+0.5,{align:'right'});pdf.text(row.total.toString(),138,y+0.5,{align:'right'});const p=row.total?(row.marks/row.total*100).toFixed(1):0;const g2=gG(parseFloat(p));const[r3,g3,b3]=gC(g2);pdf.setTextColor(r3,g3,b3);pdf.text(p+'%',154,y+0.5,{align:'right'});pdf.text(g2,175,y+0.5,{align:'right'});y+=7;}
+  });
+  y+=2;
+  const gp=gmx?(gm/gmx*100).toFixed(1):0,gg=gG(parseFloat(gp));
+  pdf.setFillColor(20,15,40);pdf.setDrawColor(167,139,250);pdf.setLineWidth(0.3);pdf.roundedRect(10,y,W-20,11,1,1,'FD');
+  pdf.setFont('helvetica','bold');pdf.setFontSize(9);pdf.setTextColor(167,139,250);pdf.text('GRAND TOTAL',14,y+7);
+  pdf.setTextColor(226,232,240);pdf.text(gm.toString(),120,y+7,{align:'right'});pdf.text(gmx.toString(),138,y+7,{align:'right'});
+  const[rg,gg2,bg]=gC(gg);pdf.setTextColor(rg,gg2,bg);pdf.text(gp+'%',154,y+7,{align:'right'});pdf.setFontSize(11);pdf.text(gg,175,y+7,{align:'right'});
+  y+=18;
+  const present=atts.filter(a=>a.status==='present').length,attPct=atts.length?(present/atts.length*100).toFixed(1):0;
+  const attC=parseFloat(attPct)>=75?[110,231,183]:[248,113,113];
+  pdf.setFillColor(15,23,42);pdf.setDrawColor(50,60,90);pdf.setLineWidth(0.3);
+  pdf.roundedRect(10,y,58,24,2,2,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('ATTENDANCE',15,y+7);pdf.setFontSize(14);pdf.setTextColor(...attC);pdf.text(attPct+'%',39,y+17,{align:'center'});pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text(`${present}/${atts.length} days`,39,y+22,{align:'center'});
+  pdf.setFillColor(15,23,42);pdf.roundedRect(72,y,58,24,2,2,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('CLASS RANK',77,y+7);pdf.setFontSize(14);pdf.setTextColor(129,140,248);pdf.text(rank?'#'+rank:'-',101,y+17,{align:'center'});pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('out of '+(totalStudents||'-')+' students',101,y+22,{align:'center'});
+  pdf.setFillColor(15,23,42);pdf.roundedRect(134,y,66,24,2,2,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('OVERALL GRADE',139,y+7);pdf.setFontSize(18);pdf.setTextColor(rg,gg2,bg);pdf.text(gg,167,y+18,{align:'center'});pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text(gp+'% overall',167,y+23,{align:'center'});
+  y+=32;
+  pdf.setFont('helvetica','bold');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('GRADING SCALE:',14,y+3);
+  [['A+','90-100%'],['A','80-89%'],['B+','70-79%'],['B','60-69%'],['C','50-59%'],['F','<50%']].forEach(([g,r],i)=>{const c=[[110,231,183],[110,231,183],[129,140,248],[129,140,248],[251,191,36],[248,113,113]][i];pdf.setTextColor(...c);pdf.setFont('helvetica','bold');pdf.text(g,55+i*25,y+3);pdf.setTextColor(100,116,139);pdf.setFont('helvetica','normal');pdf.text(r,55+i*25+5,y+3);});
+  pdf.setDrawColor(50,60,90);pdf.setLineWidth(0.3);pdf.line(80,H-30,126,H-30);pdf.line(148,H-30,196,H-30);
+  pdf.setFont('helvetica','normal');pdf.setFontSize(7);pdf.setTextColor(100,116,139);pdf.text('Teacher Signature',80,H-24);pdf.text('Principal Signature',148,H-24);
+  pdf.setFillColor(15,23,42);pdf.rect(0,H-14,W,14,'F');pdf.setDrawColor(167,139,250);pdf.setLineWidth(0.3);pdf.line(0,H-14,W,H-14);
+  pdf.setFont('helvetica','normal');pdf.setFontSize(6.5);pdf.setTextColor(100,116,139);pdf.text('This is a computer-generated marksheet. | Vision IT Computer Institute | VIMS v2.0',W/2,H-7,{align:'center'});
+  pdf.save(`My_Marksheet_${courseObj.name||'Course'}_${u.name||u.userId}.pdf`);
+  toast('Marksheet downloaded!','success');
+}
 
 initApp();
 })();
