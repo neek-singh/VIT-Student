@@ -2853,7 +2853,10 @@ async function loadSpecialOffers() {
       where('studentId','==',session.userId)
     ));
     const offers = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o => o.status === 'pending' && (!o.validUntil || o.validUntil >= today));
+      .filter(o => {
+        if(o.status === 'rejected') return true; // show rejection briefly
+        return (o.status === 'pending' || o.status === 'student-accepted') && (!o.validUntil || o.validUntil >= today);
+      });
 
     const box = document.getElementById('specialOffersBox');
     const list = document.getElementById('specialOffersList');
@@ -2881,8 +2884,13 @@ async function loadSpecialOffers() {
           </div>
         </div>
         <div class="flex gap-2">
-          <button onclick="acceptSpecialOffer('${o.id}','${o.courseId}','${(o.courseName||'').replace(/'/g,"\\'")}','${o.finalFee}')" class="btn flex-1 justify-center text-xs font-bold" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000">✅ Accept Offer</button>
-          <button onclick="declineSpecialOffer('${o.id}')" class="btn bd text-xs">Decline</button>
+          ${o.status === 'student-accepted'
+            ? `<div class="flex-1 text-center py-2 px-3 rounded-xl text-xs font-semibold text-yellow-400" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25)">⏳ Admin Approval Pending...</div>`
+            : o.status === 'rejected'
+            ? `<div class="flex-1 text-center py-2 px-3 rounded-xl text-xs font-semibold text-red-400" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25)">❌ Request Rejected — Admin se contact karein</div>`
+            : `<button onclick="acceptSpecialOffer('${o.id}','${o.courseId}','${(o.courseName||'').replace(/'/g,"\\'")}','${o.finalFee}')" class="btn flex-1 justify-center text-xs font-bold" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000">✅ Accept Offer</button>
+          <button onclick="declineSpecialOffer('${o.id}')" class="btn bd text-xs">Decline</button>`
+          }
         </div>
       </div>`;
     }).join('');
@@ -2895,40 +2903,40 @@ async function loadSpecialOffers() {
 window.acceptSpecialOffer = async (offerId, courseId, courseName, finalFee) => {
   const feeNum = parseFloat(finalFee)||0;
   const confirmMsg = feeNum === 0
-    ? `✅ "${courseName}" mein FREE enroll ho jaoge!\n\nAccept karein?`
-    : `✅ "${courseName}" mein ₹${feeNum.toLocaleString('en-IN')} mein enroll ho jaoge!\n\nAccept karein?`;
+    ? `✅ "${courseName}" ka FREE offer accept karein?\n\nAdmin approval ke baad enroll ho jaoge.`
+    : `✅ "${courseName}" mein ₹${feeNum.toLocaleString('en-IN')} wala offer accept karein?\n\nAdmin approval ke baad enroll ho jaoge.`;
   if(!confirm(confirmMsg)) return;
 
   try {
-    // Get offer details
     const offerDoc = await getDoc(doc(db,'specialOffers',offerId));
     if(!offerDoc.exists()){ toast('Offer not found','error'); return; }
-    const offer = offerDoc.data();
 
-    // Check not already enrolled
     const exEnroll = myEnrollments.find(e=>e.courseId===courseId);
     if(exEnroll){ toast('Already enrolled in this course!','info'); return; }
 
-    // Get course details
-    const cDoc = await getDoc(doc(db,'courses',courseId));
-    const course = cDoc.exists() ? cDoc.data() : {};
-
-    // Create enrollment
-    await addDoc(collection(db,'enrollments'),{
-      studentId: session.userId, studentName: session.name,
-      courseId, courseName,
-      teacherId: course.teacherId||'', teacherName: course.teacherName||'',
-      enrolledAt: serverTimestamp(), enrolledBy: 'student-offer',
-      offerId, offerFinalFee: offer.finalFee, type:'special-offer'
+    // Mark offer as student-accepted (pending admin approval)
+    await updateDoc(doc(db,'specialOffers',offerId),{
+      status:'student-accepted',
+      acceptedAt: serverTimestamp(),
+      acceptedByStudent: session.userId
     });
 
-    // Mark offer as accepted
-    await updateDoc(doc(db,'specialOffers',offerId),{status:'accepted', acceptedAt:serverTimestamp()});
+    // Send notification to admin
+    await addDoc(collection(db,'notifications'),{
+      to: 'admin',
+      type: 'offer-approval-request',
+      title: '🎁 Offer Acceptance Request',
+      message: `${session.name} ne "${courseName}" ka special offer accept kiya hai. Enrollment approve karein.`,
+      offerId, courseId, courseName,
+      studentId: session.userId, studentName: session.name,
+      finalFee: feeNum,
+      read: false,
+      createdAt: serverTimestamp()
+    });
 
-    await loadMyEnrollments();
     await loadSpecialOffers();
-    toast(`🎉 Congratulations! "${courseName}" mein enroll ho gaye!`,'success');
-  } catch(e){ console.error(e); toast('Enrollment failed. Try again.','error'); }
+    toast(`✅ Offer accept kar liya! Admin approval ka wait karein.`,'success');
+  } catch(e){ console.error(e); toast('Error. Try again.','error'); }
 };
 
 window.declineSpecialOffer = async (offerId) => {
