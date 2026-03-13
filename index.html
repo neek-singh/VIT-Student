@@ -1492,8 +1492,15 @@ window.loadStudentPlaylists = async () => {
     return;
   }
   grid.innerHTML = '<div class="gc p-6 text-center text-slate-600 col-span-full">Loading playlists...</div>';
-  const snap = await getDocs(query(collection(db,'playlists'), where('courseId','==',courseId), where('visibility','==','published')));
-  studentAllPlaylists = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (a.order||0)-(b.order||0));
+  const snap = await getDocs(query(collection(db,'playlists'), where('courseId','==',courseId)));
+  const now = new Date();
+  studentAllPlaylists = snap.docs.map(d => ({id:d.id,...d.data()}))
+    .filter(p => {
+      if (p.isDraft || p.visibility === 'draft') return false;
+      if (p.publishAt) { const pa = p.publishAt?.toDate?.() ?? new Date(p.publishAt); return pa <= now; }
+      return true;
+    })
+    .sort((a,b) => (a.order||0)-(b.order||0));
 
   if (!studentAllPlaylists.length) {
     grid.innerHTML = `<div class="gc p-8 text-center col-span-full"><div class="text-4xl mb-3">📭</div><p class="text-slate-400">No online classes available yet for this course.</p></div>`;
@@ -2345,7 +2352,14 @@ window.loadStudentMaterials = async () => {
   const snap = topicFilter ?
     await getDocs(query(collection(db,'materials'), where('courseId','==',courseId), where('topic','==',topicFilter))) :
     await getDocs(query(collection(db,'materials'), where('courseId','==',courseId)));
-  const mats = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+  const now = new Date();
+  const mats = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .filter(m => {
+      if (m.isDraft) return false;
+      if (m.publishAt) { const pa = m.publishAt?.toDate?.() ?? new Date(m.publishAt); return pa <= now; }
+      return true;
+    })
+    .sort((a,b)=>{
     const da = a.createdAt?.toDate?a.createdAt.toDate():new Date(0);
     const db2 = b.createdAt?.toDate?b.createdAt.toDate():new Date(0);
     return db2-da;
@@ -2392,7 +2406,13 @@ window.loadStudentHomework = async () => {
   const el = document.getElementById('studentHwList');
   if (!courseId) { el.innerHTML = '<div class="gc p-6 text-center text-slate-600">Select a course to view homework</div>'; return; }
   const snap = await getDocs(query(collection(db,'homeworks'), where('courseId','==',courseId), where('isActive','==',true)));
-  let hws = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const now = new Date();
+  let hws = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .filter(h => {
+      if (h.isDraft) return false;
+      if (h.publishAt) { const pa = h.publishAt?.toDate?.() ?? new Date(h.publishAt); return pa <= now; }
+      return true;
+    });
   if (dateFilter) hws = hws.filter(h=>h.date===dateFilter);
   hws.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   // Get submissions
