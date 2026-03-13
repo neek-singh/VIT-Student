@@ -2847,13 +2847,13 @@ let myFreePermissions = new Set(); // courseIds where admin allowed self-enroll
 async function loadSpecialOffers() {
   try {
     const today = new Date().toISOString().split('T')[0];
+    // Single where clause to avoid composite index requirement
     const snap = await getDocs(query(
       collection(db,'specialOffers'),
-      where('studentId','==',session.userId),
-      where('status','==','pending')
+      where('studentId','==',session.userId)
     ));
     const offers = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o => o.validUntil >= today); // exclude expired
+      .filter(o => o.status === 'pending' && (!o.validUntil || o.validUntil >= today));
 
     const box = document.getElementById('specialOffersBox');
     const list = document.getElementById('specialOffersList');
@@ -2862,10 +2862,11 @@ async function loadSpecialOffers() {
     if(!offers.length){ box?.classList.add('hidden'); return; }
 
     box?.classList.remove('hidden');
+    box?.classList.add('flex');
     if(badge) badge.textContent = offers.length;
 
     list.innerHTML = offers.map(o => {
-      const daysLeft = Math.ceil((new Date(o.validUntil) - new Date()) / 86400000);
+      const daysLeft = o.validUntil ? Math.ceil((new Date(o.validUntil) - new Date()) / 86400000) : 99;
       return `<div class="p-3 rounded-xl" style="background:rgba(0,0,0,0.3);border:1px solid rgba(251,191,36,0.15)">
         <div class="flex items-start justify-between gap-2 mb-2">
           <div class="flex-1 min-w-0">
@@ -2873,18 +2874,21 @@ async function loadSpecialOffers() {
             <div class="flex items-center gap-2 mt-0.5">
               <span class="text-slate-500 line-through text-xs">₹${(o.originalFee||0).toLocaleString('en-IN')}</span>
               <span class="text-yellow-400 font-bold text-sm">${o.finalFee===0?'🎁 FREE':'₹'+o.finalFee.toLocaleString('en-IN')}</span>
-              <span class="text-emerald-400 text-xs">(Save ₹${(o.originalFee-o.finalFee).toLocaleString('en-IN')})</span>
+              <span class="text-emerald-400 text-xs">(Save ₹${((o.originalFee||0)-(o.finalFee||0)).toLocaleString('en-IN')})</span>
             </div>
-            <p class="text-slate-400 text-xs italic mt-1">"${o.message}"</p>
-            <p class="text-${daysLeft<=2?'red':'yellow'}-400 text-xs mt-1">⏰ ${daysLeft} day${daysLeft!==1?'s':''} left · Expires ${o.validUntil}</p>
+            ${o.message?`<p class="text-slate-400 text-xs italic mt-1">"${o.message}"</p>`:''}
+            ${o.validUntil?`<p class="text-${daysLeft<=2?'red':'yellow'}-400 text-xs mt-1">⏰ ${daysLeft} day${daysLeft!==1?'s':''} left · Expires ${o.validUntil}</p>`:''}
           </div>
         </div>
         <div class="flex gap-2">
-          <button onclick="acceptSpecialOffer('${o.id}','${o.courseId}','${o.courseName.replace(/'/g,"\\'")}','${o.finalFee}')" class="btn flex-1 justify-center text-xs font-bold" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000">✅ Accept Offer</button>
+          <button onclick="acceptSpecialOffer('${o.id}','${o.courseId}','${(o.courseName||'').replace(/'/g,"\\'")}','${o.finalFee}')" class="btn flex-1 justify-center text-xs font-bold" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000">✅ Accept Offer</button>
           <button onclick="declineSpecialOffer('${o.id}')" class="btn bd text-xs">Decline</button>
         </div>
       </div>`;
     }).join('');
+
+    // Also auto-show the panel if offers exist
+    document.getElementById('dashOffersPanel')?.classList.remove('hidden');
   } catch(e) { console.error('Offers load error:', e); }
 }
 
